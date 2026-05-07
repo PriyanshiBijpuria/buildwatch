@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Buildwatch ‚Äî Dashboard</title>
+<title>Buildwatch — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -28,10 +28,10 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
 
-/* ‚îÄ‚îÄ LAYOUT ‚îÄ‚îÄ */
+/* ── LAYOUT ── */
 .app{display:grid;grid-template-columns:var(--sidebar) 1fr;grid-template-rows:56px 1fr;height:100vh;overflow:hidden}
 
-/* ‚îÄ‚îÄ TOPBAR ‚îÄ‚îÄ */
+/* ── TOPBAR ── */
 .topbar{
   grid-column:1/-1;
   background:var(--s1);
@@ -107,7 +107,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
   box-shadow:0 0 12px rgba(43,127,255,.3);
 }
 
-/* ‚îÄ‚îÄ SIDEBAR ‚îÄ‚îÄ */
+/* ── SIDEBAR ── */
 .sidebar{
   background:var(--s1);
   border-right:1px solid var(--border);
@@ -146,7 +146,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .sbp-sub{font-size:11px;color:var(--muted)}
 .sbp-sub em{color:var(--green);font-style:normal}
 
-/* ‚îÄ‚îÄ MAIN ‚îÄ‚îÄ */
+/* ── MAIN ── */
 .main{
   overflow-y:auto;overflow-x:hidden;
   background:var(--bg);
@@ -156,11 +156,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .main::-webkit-scrollbar-track{background:transparent}
 .main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* ‚îÄ‚îÄ VIEWS (tabs) ‚îÄ‚îÄ */
+/* ── VIEWS (tabs) ── */
 .view{display:none;padding:28px 32px;flex-direction:column;gap:24px;flex:1}
 .view.active{display:flex}
 
-/* ‚îÄ‚îÄ PAGE HEADER ‚îÄ‚îÄ */
+/* ── PAGE HEADER ── */
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .page-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:-.01em;line-height:1}
 .page-sub{font-size:13px;color:var(--muted);margin-top:4px}
@@ -171,7 +171,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .btn-secondary{background:var(--s2);color:var(--text2);border:1px solid var(--border)}
 .btn-secondary:hover{border-color:rgba(43,127,255,.3);color:var(--text)}
 
-/* ‚îÄ‚îÄ ALERT BANNER ‚îÄ‚îÄ */
+/* ── ALERT BANNER ── */
 .alert-banner{
   background:rgba(255,176,32,.06);
   border:1px solid rgba(255,176,32,.2);
@@ -188,7 +188,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .ab-action{background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.25);color:var(--gold);border-radius:100px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}
 .ab-action:hover{background:rgba(255,176,32,.2)}
 
-/* ‚îÄ‚îÄ STAT CARDS ‚îÄ‚îÄ */
+/* ── STAT CARDS ── */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .stat-card{
   background:var(--s1);border:1px solid var(--border);
@@ -205,18 +205,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .sc-sub.up{color:var(--green)}.sc-sub.warn{color:var(--gold)}.sc-sub.live{color:var(--accent2)}
 .sc-glow{position:absolute;bottom:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.06;pointer-events:none}
 
-/* ‚îÄ‚îÄ CONTENT GRID ‚îÄ‚îÄ */
+/* ── CONTENT GRID ── */
 .content-grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
 .content-grid-full{display:grid;grid-template-columns:1fr;gap:20px}
 
-/* ‚îÄ‚îÄ CARD ‚îÄ‚îÄ */
+/* ── CARD ── */
 .card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;overflow:hidden}
 .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.01em}
 .card-action{font-size:12px;color:var(--accent2);cursor:pointer;font-weight:500;transition:opacity .2s}
 .card-action:hover{opacity:.7}
 
-/* ‚îÄ‚îÄ MILESTONE TIMELINE ‚îÄ‚îÄ */
+/* ── MILESTONE TIMELINE ── */
 .timeline{position:relative;display:flex;flex-direction:column}
 .tl-item{display:flex;gap:16px;position:relative}
 .tl-item::before{content:'';position:absolute;left:15px;top:32px;bottom:-8px;width:2px;background:var(--border2)}
@@ -245,7 +245,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .prog-track{background:var(--faint);border-radius:6px;height:8px;overflow:hidden}
 .prog-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 10px rgba(43,127,255,.3);transition:width 1.4s cubic-bezier(.4,0,.2,1)}
 
-/* ‚îÄ‚îÄ COUNTDOWN ‚îÄ‚îÄ */
+/* ── COUNTDOWN ── */
 .countdown-card{
   background:linear-gradient(160deg,#060C1C,#0A1430);
   border:1px solid rgba(43,127,255,.2);
@@ -259,7 +259,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .cd-date{font-size:12px;color:var(--muted);background:rgba(43,127,255,.06);border-radius:10px;padding:10px;border:1px solid rgba(43,127,255,.1)}
 .cd-date strong{color:var(--text);font-weight:500}
 
-/* ‚îÄ‚îÄ PAYMENT SCHEDULE ‚îÄ‚îÄ */
+/* ── PAYMENT SCHEDULE ── */
 .pay-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border2);transition:background .15s}
 .pay-item:last-child{border-bottom:none}
 .pay-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -276,7 +276,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 }
 .pay-due-row .pay-date{color:var(--gold);font-weight:600}
 
-/* ‚îÄ‚îÄ PHOTO FEED ‚îÄ‚îÄ */
+/* ── PHOTO FEED ── */
 .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .photo-thumb{
   border-radius:12px;overflow:hidden;
@@ -314,7 +314,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .pt5{background:linear-gradient(135deg,#0C1628,#101E34)}
 .pt6{background:linear-gradient(135deg,#080E1A,#0C1828)}
 
-/* ‚îÄ‚îÄ DOCUMENT VAULT ‚îÄ‚îÄ */
+/* ── DOCUMENT VAULT ── */
 .doc-list{display:flex;flex-direction:column;gap:8px}
 .doc-item{
   display:flex;align-items:center;gap:14px;
@@ -342,15 +342,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .dt-req{background:rgba(255,176,32,.1);color:var(--gold)}
 .dt-old{background:var(--faint);color:var(--muted);border:1px solid var(--border)}
 
-/* ‚îÄ‚îÄ OVERVIEW RIGHT COLUMN ‚îÄ‚îÄ */
+/* ── OVERVIEW RIGHT COLUMN ── */
 .right-stack{display:flex;flex-direction:column;gap:16px}
 
-/* ‚îÄ‚îÄ TABS (for sections within pages) ‚îÄ‚îÄ */
+/* ── TABS (for sections within pages) ── */
 .seg-tabs{display:flex;gap:2px;background:var(--faint);border-radius:10px;padding:3px;width:fit-content;margin-bottom:20px}
 .seg-tab{padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;border:none;background:none;font-family:'DM Sans',sans-serif}
 .seg-tab.active{background:var(--s2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
 
-/* ‚îÄ‚îÄ PHOTO VIEW (full page) ‚îÄ‚îÄ */
+/* ── PHOTO VIEW (full page) ── */
 .photo-grid-lg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .photo-thumb-lg{
   border-radius:14px;overflow:hidden;
@@ -366,7 +366,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .photo-thumb-lg .photo-emoji{font-size:36px}
 .photo-thumb-lg .photo-label{font-size:12px}
 
-/* ‚îÄ‚îÄ PAYMENTS VIEW ‚îÄ‚îÄ */
+/* ── PAYMENTS VIEW ── */
 .pay-table{width:100%;border-collapse:collapse}
 .pay-table th{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 16px 12px;border-bottom:1px solid var(--border)}
 .pay-table td{padding:14px 16px;border-bottom:1px solid var(--border2);font-size:13px;vertical-align:middle}
@@ -378,7 +378,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .ps-upcoming{background:var(--faint);color:var(--muted)}
 .pay-table-amt{font-family:'Cormorant Garamond',serif;font-size:17px}
 
-/* ‚îÄ‚îÄ BACK BUTTON ‚îÄ‚îÄ */
+/* ── BACK BUTTON ── */
 .back-btn{
   display:inline-flex;align-items:center;gap:7px;
   font-size:12px;font-weight:600;color:var(--muted);
@@ -390,7 +390,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .back-btn:hover{color:var(--text);border-color:rgba(43,127,255,.3);background:var(--s2)}
 .back-btn span{font-size:14px;line-height:1}
 
-/* ‚îÄ‚îÄ PHOTO REAL IMAGES ‚îÄ‚îÄ */
+/* ── PHOTO REAL IMAGES ── */
 .photo-thumb-lg{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--border);cursor:pointer;transition:transform .2s,border-color .2s;display:block;background:var(--faint)}
 .photo-thumb-lg:hover{transform:scale(1.02);border-color:rgba(43,127,255,.3)}
 .photo-thumb-lg img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
@@ -406,7 +406,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .photo-thumb .photo-date{position:absolute;bottom:7px;left:7px;background:rgba(4,8,16,.75);color:rgba(232,240,255,.7);font-size:10px;padding:2px 7px;border-radius:4px;backdrop-filter:blur(4px)}
 .photo-thumb .photo-new{position:absolute;top:6px;right:6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;font-family:'Syne',sans-serif}
 
-/* ‚îÄ‚îÄ MODAL OVERLAY ‚îÄ‚îÄ */
+/* ── MODAL OVERLAY ── */
 .modal-overlay{
   position:fixed;inset:0;z-index:1000;
   background:rgba(4,8,16,.85);
@@ -443,7 +443,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .modal-close:hover{background:var(--s2);color:var(--text)}
 .modal-body{padding:24px}
 
-/* ‚îÄ‚îÄ REMINDER MODAL ‚îÄ‚îÄ */
+/* ── REMINDER MODAL ── */
 .rm-payment-card{
   background:rgba(255,176,32,.05);
   border:1px solid rgba(255,176,32,.2);
@@ -478,7 +478,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
   display:flex;gap:10px;justify-content:flex-end;
 }
 
-/* ‚îÄ‚îÄ CHAT INTERFACE ‚îÄ‚îÄ */
+/* ── CHAT INTERFACE ── */
 .chat-modal .modal{width:min(440px,92vw);height:min(600px,85vh);display:flex;flex-direction:column}
 .chat-modal .modal-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
 .chat-modal .modal-body::-webkit-scrollbar{width:4px}
@@ -558,7 +558,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 }
 .chat-qbtn:hover{background:rgba(43,127,255,.14);border-color:var(--accent)}
 
-/* ‚îÄ‚îÄ TOAST ‚îÄ‚îÄ */
+/* ── TOAST ── */
 .toast-container{position:fixed;bottom:28px;right:28px;z-index:2000;display:flex;flex-direction:column;gap:10px;pointer-events:none}
 .toast{
   background:var(--s1);border:1px solid var(--border);
@@ -577,7 +577,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .toast-sub{font-size:12px;color:var(--muted)}
 .toast-close{font-size:14px;color:var(--muted);cursor:pointer;flex-shrink:0;line-height:1}
 
-/* ‚îÄ‚îÄ ANIMATIONS ‚îÄ‚îÄ */
+/* ── ANIMATIONS ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeUp .35s ease both}
 .fade-in:nth-child(1){animation-delay:.05s}
@@ -585,7 +585,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .fade-in:nth-child(3){animation-delay:.15s}
 .fade-in:nth-child(4){animation-delay:.2s}
 
-/* ‚îÄ‚îÄ GRAIN ‚îÄ‚îÄ */
+/* ── GRAIN ── */
 body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");z-index:9999}
 
 @media(max-width:900px){
@@ -600,7 +600,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
 <body>
 <div class="app">
 
-  <!-- ‚ïê‚ïê TOPBAR ‚ïê‚ïê -->
+  <!-- ══ TOPBAR ══ -->
   <header class="topbar">
     <a class="tb-logo" href="buildwatch-v4.html"><span class="tb-pulse"></span>Buildwatch</a>
     <div class="tb-divider"></div>
@@ -608,41 +608,41 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
       <div class="tb-proj-dot" id="tbDot"></div>
       <div>
         <div class="tb-proj-name" id="tbProjName">Godrej Meridian</div>
-        <div class="tb-proj-sub" id="tbProjSub">Tower B ¬∑ Flat 14C ¬∑ Pune</div>
+        <div class="tb-proj-sub" id="tbProjSub">Tower B · Flat 14C · Pune</div>
       </div>
-      <div class="tb-caret">‚ñæ</div>
+      <div class="tb-caret">▾</div>
       <div class="proj-dropdown" id="projDropdown">
         <div class="proj-opt active" onclick="switchProject(0,event)">
           <div class="proj-opt-dot" style="background:#2B7FFF"></div>
           <div class="proj-opt-info">
             <div class="proj-opt-name">Godrej Meridian</div>
-            <div class="proj-opt-meta">Tower B ¬∑ Flat 14C ¬∑ Pune</div>
+            <div class="proj-opt-meta">Tower B · Flat 14C · Pune</div>
           </div>
-          <div class="proj-opt-check">‚úì</div>
+          <div class="proj-opt-check">✓</div>
         </div>
         <div class="proj-opt" onclick="switchProject(1,event)">
           <div class="proj-opt-dot" style="background:#00E5A0"></div>
           <div class="proj-opt-info">
             <div class="proj-opt-name">DLF The Crest</div>
-            <div class="proj-opt-meta">Phase 3 ¬∑ Unit 8B ¬∑ Gurugram</div>
+            <div class="proj-opt-meta">Phase 3 · Unit 8B · Gurugram</div>
           </div>
         </div>
         <div class="proj-opt" onclick="switchProject(2,event)">
           <div class="proj-opt-dot" style="background:#FFB020"></div>
           <div class="proj-opt-info">
             <div class="proj-opt-name">Lodha Palava</div>
-            <div class="proj-opt-meta">Wing C ¬∑ Flat 22A ¬∑ Mumbai</div>
+            <div class="proj-opt-meta">Wing C · Flat 22A · Mumbai</div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="tb-spacer"></div>
-    <div class="tb-notif" title="Notifications"><span>üîî</span><div class="notif-badge">2</div></div>
+    <div class="tb-notif" title="Notifications"><span>🔔</span><div class="notif-badge">2</div></div>
     <div class="tb-avatar">PB</div>
   </header>
 
-  <!-- ‚ïê‚ïê SIDEBAR ‚ïê‚ïê -->
+  <!-- ══ SIDEBAR ══ -->
   <aside class="sidebar">
     <div class="sb-section">
       <div class="sb-progress">
@@ -655,49 +655,49 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
     <div class="sb-section">
       <div class="sb-label">Overview</div>
       <div class="sb-item active" data-view="overview" onclick="switchView('overview',this)">
-        <span class="sb-icon">üìä</span>Dashboard
+        <span class="sb-icon">📊</span>Dashboard
       </div>
     </div>
     <div class="sb-section">
       <div class="sb-label">Construction</div>
       <div class="sb-item" data-view="construction" onclick="switchView('construction',this)">
-        <span class="sb-icon">üèó</span>Timeline
+        <span class="sb-icon">🏗</span>Timeline
       </div>
       <div class="sb-item" data-view="photos" onclick="switchView('photos',this)">
-        <span class="sb-icon">üì∑</span>Site Photos
+        <span class="sb-icon">📷</span>Site Photos
         <span class="sb-count blue">2</span>
       </div>
     </div>
     <div class="sb-section">
       <div class="sb-label">Finances</div>
       <div class="sb-item" data-view="payments" onclick="switchView('payments',this)">
-        <span class="sb-icon">üí≥</span>Payments
+        <span class="sb-icon">💳</span>Payments
         <span class="sb-count">1</span>
       </div>
       <div class="sb-item" data-view="documents" onclick="switchView('documents',this)">
-        <span class="sb-icon">üìÑ</span>Documents
+        <span class="sb-icon">📄</span>Documents
       </div>
     </div>
     <div class="sb-section">
       <div class="sb-label">Account</div>
       <div class="sb-item" onclick="">
-        <span class="sb-icon">‚öôÔ∏è</span>Settings
+        <span class="sb-icon">⚙️</span>Settings
       </div>
       <div class="sb-item" onclick="window.location.href='buildwatch-v4.html'">
-        <span class="sb-icon">‚Üê</span>Back to site
+        <span class="sb-icon">←</span>Back to site
       </div>
     </div>
   </aside>
 
-  <!-- ‚ïê‚ïê MAIN ‚ïê‚ïê -->
+  <!-- ══ MAIN ══ -->
   <main class="main">
 
-    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ OVERVIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <!-- ───── OVERVIEW ───── -->
     <div class="view active" id="view-overview">
 
       <div class="page-header fade-in">
         <div>
-          <div class="page-title">Good morning, Priyanshi üëã</div>
+          <div class="page-title">Good morning, Priyanshi 👋</div>
           <div class="page-sub" id="overviewSub">Here is everything happening with Godrej Meridian right now</div>
         </div>
         <div class="page-actions">
@@ -708,12 +708,12 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
 
       <!-- alert -->
       <div class="alert-banner fade-in">
-        <div class="ab-icon">‚ö°</div>
+        <div class="ab-icon">⚡</div>
         <div class="ab-content">
           <div class="ab-title">Payment due in 38 days</div>
-          <div class="ab-sub">Slab 7 completion triggers your next instalment of <span>‚Çπ4,20,000</span>. Expected due date: 13 June 2026.</div>
+          <div class="ab-sub">Slab 7 completion triggers your next instalment of <span>₹4,20,000</span>. Expected due date: 13 June 2026.</div>
         </div>
-        <button class="ab-action" onclick="switchView('payments',null)">View payment plan ‚Üí</button>
+        <button class="ab-action" onclick="switchView('payments',null)">View payment plan →</button>
       </div>
 
       <!-- stats -->
@@ -721,25 +721,25 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
         <div class="stat-card fade-in">
           <div class="sc-label">Overall progress</div>
           <div class="sc-val" id="statProgress">62%</div>
-          <div class="sc-sub up">‚Üë +8% since last month</div>
+          <div class="sc-sub up">↑ +8% since last month</div>
           <div class="sc-glow" style="background:var(--accent)"></div>
         </div>
         <div class="stat-card fade-in">
           <div class="sc-label">Days to possession</div>
-          <div class="sc-val" id="statDays">‚Äî</div>
+          <div class="sc-val" id="statDays">—</div>
           <div class="sc-sub">Est. 31 Aug 2027</div>
           <div class="sc-glow" style="background:var(--accent2)"></div>
         </div>
         <div class="stat-card fade-in">
           <div class="sc-label">Amount paid</div>
-          <div class="sc-val" id="statPaid">‚Çπ68L</div>
-          <div class="sc-sub warn">‚Çπ42L remaining</div>
+          <div class="sc-val" id="statPaid">₹68L</div>
+          <div class="sc-sub warn">₹42L remaining</div>
           <div class="sc-glow" style="background:var(--gold)"></div>
         </div>
         <div class="stat-card fade-in">
           <div class="sc-label">Last site update</div>
           <div class="sc-val">3d</div>
-          <div class="sc-sub live">‚óè 2 new photos added</div>
+          <div class="sc-sub live">● 2 new photos added</div>
           <div class="sc-glow" style="background:var(--green)"></div>
         </div>
       </div>
@@ -752,7 +752,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
           <div class="card fade-in">
             <div class="card-header">
               <div class="card-title">Construction milestones</div>
-              <div class="card-action" onclick="switchView('construction',null)">Full timeline ‚Üí</div>
+              <div class="card-action" onclick="switchView('construction',null)">Full timeline →</div>
             </div>
             <div class="prog-wrap">
               <div class="prog-label-row"><span>Tower B overall completion</span><span>62%</span></div>
@@ -760,27 +760,27 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
             </div>
             <div class="timeline">
               <div class="tl-item">
-                <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
-                <div class="tl-content"><div class="tl-row"><div class="tl-name">Foundation and basement</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Mar 2025 ¬∑ Plinth and waterproofing complete</div></div>
+                <div class="tl-left"><div class="tl-dot tl-done">✓</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name">Foundation and basement</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Mar 2025 · Plinth and waterproofing complete</div></div>
               </div>
               <div class="tl-item">
-                <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
-                <div class="tl-content"><div class="tl-row"><div class="tl-name">Podium and parking structure</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Jul 2025 ¬∑ 3 basement levels complete</div></div>
+                <div class="tl-left"><div class="tl-dot tl-done">✓</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name">Podium and parking structure</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Jul 2025 · 3 basement levels complete</div></div>
               </div>
               <div class="tl-item">
-                <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
-                <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 1 to 8 structure</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Nov 2025 ¬∑ Slab casting and column work</div></div>
+                <div class="tl-left"><div class="tl-dot tl-done">✓</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 1 to 8 structure</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Nov 2025 · Slab casting and column work</div></div>
               </div>
               <div class="tl-item">
-                <div class="tl-left"><div class="tl-dot tl-active">üèó</div></div>
-                <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 9 to 16 ‚Äî Slab 14 just poured</div><div class="tl-tag tag-active">In progress</div></div><div class="tl-meta" style="color:var(--accent)">Your floor is coming up ¬∑ Due Jun 2026</div></div>
+                <div class="tl-left"><div class="tl-dot tl-active">🏗</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 9 to 16 — Slab 14 just poured</div><div class="tl-tag tag-active">In progress</div></div><div class="tl-meta" style="color:var(--accent)">Your floor is coming up · Due Jun 2026</div></div>
               </div>
               <div class="tl-item">
-                <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+                <div class="tl-left"><div class="tl-dot tl-pending">○</div></div>
                 <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Brick, block and finishing</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Oct 2026</div></div>
               </div>
               <div class="tl-item">
-                <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+                <div class="tl-left"><div class="tl-dot tl-pending">○</div></div>
                 <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Possession and handover</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Aug 2027</div></div>
               </div>
             </div>
@@ -790,7 +790,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
           <div class="card fade-in">
             <div class="card-header">
               <div class="card-title">Recent site photos</div>
-              <div class="card-action" onclick="switchView('photos',null)">View all ‚Üí</div>
+              <div class="card-action" onclick="switchView('photos',null)">View all →</div>
             </div>
             <div class="photo-grid">
               <div class="photo-thumb">
@@ -815,28 +815,28 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
         <div class="right-stack">
           <div class="countdown-card fade-in">
             <div class="cd-eyebrow">Days to possession</div>
-            <div class="cd-num" id="cdMain">‚Äî</div>
+            <div class="cd-num" id="cdMain">—</div>
             <div class="cd-unit">days remaining</div>
             <div class="cd-date">Expected: <strong>31 August 2027</strong></div>
           </div>
 
           <div class="card fade-in">
-            <div class="card-header"><div class="card-title">Payment schedule</div><div class="card-action" onclick="switchView('payments',null)">All ‚Üí</div></div>
-            <div class="pay-item"><div class="pay-dot" style="background:var(--green)"></div><div class="pay-info"><div class="pay-name">Booking amount</div><div class="pay-date">Paid 12 Jan 2024</div></div><div class="pay-amt paid">‚Çπ11L</div></div>
-            <div class="pay-item"><div class="pay-dot" style="background:var(--green)"></div><div class="pay-info"><div class="pay-name">Foundation completion</div><div class="pay-date">Paid 5 Apr 2025</div></div><div class="pay-amt paid">‚Çπ22L</div></div>
-            <div class="pay-item"><div class="pay-dot" style="background:var(--green)"></div><div class="pay-info"><div class="pay-name">Podium completion</div><div class="pay-date">Paid 20 Aug 2025</div></div><div class="pay-amt paid">‚Çπ35L</div></div>
-            <div class="pay-due-row pay-item"><div class="pay-dot" style="background:var(--gold)"></div><div class="pay-info"><div class="pay-name">Slab 7 completion</div><div class="pay-date">Due ~13 Jun 2026</div></div><div class="pay-amt due">‚Çπ4.2L</div></div>
-            <div class="pay-item"><div class="pay-dot" style="background:var(--border)"></div><div class="pay-info"><div class="pay-name">Structure completion</div><div class="pay-date">Est. Feb 2027</div></div><div class="pay-amt upcoming">‚Çπ22L</div></div>
+            <div class="card-header"><div class="card-title">Payment schedule</div><div class="card-action" onclick="switchView('payments',null)">All →</div></div>
+            <div class="pay-item"><div class="pay-dot" style="background:var(--green)"></div><div class="pay-info"><div class="pay-name">Booking amount</div><div class="pay-date">Paid 12 Jan 2024</div></div><div class="pay-amt paid">₹11L</div></div>
+            <div class="pay-item"><div class="pay-dot" style="background:var(--green)"></div><div class="pay-info"><div class="pay-name">Foundation completion</div><div class="pay-date">Paid 5 Apr 2025</div></div><div class="pay-amt paid">₹22L</div></div>
+            <div class="pay-item"><div class="pay-dot" style="background:var(--green)"></div><div class="pay-info"><div class="pay-name">Podium completion</div><div class="pay-date">Paid 20 Aug 2025</div></div><div class="pay-amt paid">₹35L</div></div>
+            <div class="pay-due-row pay-item"><div class="pay-dot" style="background:var(--gold)"></div><div class="pay-info"><div class="pay-name">Slab 7 completion</div><div class="pay-date">Due ~13 Jun 2026</div></div><div class="pay-amt due">₹4.2L</div></div>
+            <div class="pay-item"><div class="pay-dot" style="background:var(--border)"></div><div class="pay-info"><div class="pay-name">Structure completion</div><div class="pay-date">Est. Feb 2027</div></div><div class="pay-amt upcoming">₹22L</div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ CONSTRUCTION VIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <!-- ───── CONSTRUCTION VIEW ───── -->
     <div class="view" id="view-construction">
-      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>‚Üê</span> Back to dashboard</button>
+      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>←</span> Back to dashboard</button>
       <div class="page-header fade-in">
-        <div><div class="page-title">Construction timeline</div><div class="page-sub">Godrej Meridian ¬∑ Tower B ¬∑ Full milestone history</div></div>
+        <div><div class="page-title">Construction timeline</div><div class="page-sub">Godrej Meridian · Tower B · Full milestone history</div></div>
         <div class="page-actions"><button class="btn-sm btn-secondary">Download report</button></div>
       </div>
       <div class="card fade-in">
@@ -846,48 +846,48 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
         </div>
         <div class="timeline">
           <div class="tl-item fade-in">
-            <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+            <div class="tl-left"><div class="tl-dot tl-done">✓</div></div>
             <div class="tl-content"><div class="tl-row"><div class="tl-name">Excavation and site preparation</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Oct 2024</div><div class="tl-desc">Site clearing, soil testing, and excavation for basement levels completed on schedule.</div></div>
           </div>
           <div class="tl-item fade-in">
-            <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+            <div class="tl-left"><div class="tl-dot tl-done">✓</div></div>
             <div class="tl-content"><div class="tl-row"><div class="tl-name">Foundation and raft slab</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Mar 2025</div><div class="tl-desc">Raft foundation poured, plinth beam work complete, basement waterproofing applied.</div></div>
           </div>
           <div class="tl-item fade-in">
-            <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+            <div class="tl-left"><div class="tl-dot tl-done">✓</div></div>
             <div class="tl-content"><div class="tl-row"><div class="tl-name">Basement and podium structure (B3 to G)</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Jul 2025</div><div class="tl-desc">3 basement parking levels, podium slab, and ground floor lobby structure complete.</div></div>
           </div>
           <div class="tl-item fade-in">
-            <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
-            <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 1 to 8 ‚Äî Slab and columns</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Nov 2025</div><div class="tl-desc">All slab castings and structural column work for floors 1 through 8 completed ahead of schedule.</div></div>
+            <div class="tl-left"><div class="tl-dot tl-done">✓</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 1 to 8 — Slab and columns</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Nov 2025</div><div class="tl-desc">All slab castings and structural column work for floors 1 through 8 completed ahead of schedule.</div></div>
           </div>
           <div class="tl-item fade-in" style="background:rgba(43,127,255,.03);border-radius:12px;padding:8px;margin:-8px">
-            <div class="tl-left"><div class="tl-dot tl-active">üèó</div></div>
-            <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 9 to 16 ‚Äî in progress</div><div class="tl-tag tag-active">Live now</div></div><div class="tl-meta" style="color:var(--accent)">Slab 14 poured on 2 May 2026 ¬∑ Your floor (14C) is next</div><div class="tl-desc" style="color:var(--text2)">Construction team is currently working on floors 9 to 16. Slab 14 was poured this week. Your unit on floor 14C is in this section. Expected completion by June 2026.</div></div>
+            <div class="tl-left"><div class="tl-dot tl-active">🏗</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 9 to 16 — in progress</div><div class="tl-tag tag-active">Live now</div></div><div class="tl-meta" style="color:var(--accent)">Slab 14 poured on 2 May 2026 · Your floor (14C) is next</div><div class="tl-desc" style="color:var(--text2)">Construction team is currently working on floors 9 to 16. Slab 14 was poured this week. Your unit on floor 14C is in this section. Expected completion by June 2026.</div></div>
           </div>
           <div class="tl-item fade-in">
-            <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
-            <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Floors 17 to 24 ‚Äî upper structure</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Jun‚ÄìSep 2026</div></div>
+            <div class="tl-left"><div class="tl-dot tl-pending">○</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Floors 17 to 24 — upper structure</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Jun–Sep 2026</div></div>
           </div>
           <div class="tl-item fade-in">
-            <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+            <div class="tl-left"><div class="tl-dot tl-pending">○</div></div>
             <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Brick, block work and plastering</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Oct 2026</div></div>
           </div>
           <div class="tl-item fade-in">
-            <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+            <div class="tl-left"><div class="tl-dot tl-pending">○</div></div>
             <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Flooring, paint and fit-outs</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Mar 2027</div></div>
           </div>
           <div class="tl-item fade-in">
-            <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+            <div class="tl-left"><div class="tl-dot tl-pending">○</div></div>
             <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Possession and handover</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. 31 Aug 2027</div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ PHOTOS VIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <!-- ───── PHOTOS VIEW ───── -->
     <div class="view" id="view-photos">
-      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>‚Üê</span> Back to dashboard</button>
+      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>←</span> Back to dashboard</button>
       <div class="page-header fade-in">
         <div><div class="page-title">Site photos</div><div class="page-sub">Bi-weekly updates from Tower B construction site</div></div>
         <div class="page-actions"><button class="btn-sm btn-secondary">Filter by date</button></div>
@@ -897,13 +897,13 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
         <div class="photo-grid-lg">
           <div class="photo-thumb-lg">
             <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80" alt="Slab pour">
-            <div class="photo-caption">Slab 14 pour ¬∑ Floor level</div>
+            <div class="photo-caption">Slab 14 pour · Floor level</div>
             <div class="photo-date">2 May 2026</div>
             <div class="photo-new">NEW</div>
           </div>
           <div class="photo-thumb-lg">
             <img src="https://images.unsplash.com/photo-1590644365607-5f31b0a8e6f7?w=600&q=80" alt="Column reinforcement">
-            <div class="photo-caption">Column reinforcement ¬∑ Fl.13</div>
+            <div class="photo-caption">Column reinforcement · Fl.13</div>
             <div class="photo-date">2 May 2026</div>
             <div class="photo-new">NEW</div>
           </div>
@@ -924,7 +924,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
         <div class="photo-grid-lg">
           <div class="photo-thumb-lg">
             <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80" alt="Rebar work">
-            <div class="photo-caption">Rebar work ¬∑ Fl.12</div>
+            <div class="photo-caption">Rebar work · Fl.12</div>
             <div class="photo-date">4 Apr 2026</div>
           </div>
           <div class="photo-thumb-lg">
@@ -934,7 +934,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
           </div>
           <div class="photo-thumb-lg">
             <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80" alt="External facade">
-            <div class="photo-caption">External facade ¬∑ Fl.8</div>
+            <div class="photo-caption">External facade · Fl.8</div>
             <div class="photo-date">20 Mar 2026</div>
           </div>
           <div class="photo-thumb-lg">
@@ -954,7 +954,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
           </div>
           <div class="photo-thumb-lg">
             <img src="https://images.unsplash.com/photo-1567359781514-3b964e2b04d6?w=600&q=80" alt="Workers on site">
-            <div class="photo-caption">Site crew ¬∑ Morning shift</div>
+            <div class="photo-caption">Site crew · Morning shift</div>
             <div class="photo-date">6 Mar 2026</div>
           </div>
           <div class="photo-thumb-lg">
@@ -964,32 +964,32 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
           </div>
           <div class="photo-thumb-lg">
             <img src="https://images.unsplash.com/photo-1590644365607-5f31b0a8e6f7?w=600&q=80" alt="Building frame">
-            <div class="photo-caption">Frame and columns ¬∑ Fl.6</div>
+            <div class="photo-caption">Frame and columns · Fl.6</div>
             <div class="photo-date">20 Feb 2026</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ PAYMENTS VIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <!-- ───── PAYMENTS VIEW ───── -->
     <div class="view" id="view-payments">
-      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>‚Üê</span> Back to dashboard</button>
+      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>←</span> Back to dashboard</button>
       <div class="page-header fade-in">
-        <div><div class="page-title">Payment schedule</div><div class="page-sub">Godrej Meridian ¬∑ Total consideration ‚Çπ1.1 Cr</div></div>
+        <div><div class="page-title">Payment schedule</div><div class="page-sub">Godrej Meridian · Total consideration ₹1.1 Cr</div></div>
         <div class="page-actions"><button class="btn-sm btn-secondary">Download schedule</button><button class="btn-sm btn-primary" onclick="openReminder()">Set reminder</button></div>
       </div>
 
       <div class="stats-row fade-in" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card"><div class="sc-label">Total paid</div><div class="sc-val">‚Çπ68L</div><div class="sc-sub up">62% of total</div></div>
-        <div class="stat-card"><div class="sc-label">Next due</div><div class="sc-val">‚Çπ4.2L</div><div class="sc-sub warn">In 38 days</div></div>
-        <div class="stat-card"><div class="sc-label">Remaining</div><div class="sc-val">‚Çπ42L</div><div class="sc-sub">3 instalments left</div></div>
+        <div class="stat-card"><div class="sc-label">Total paid</div><div class="sc-val">₹68L</div><div class="sc-sub up">62% of total</div></div>
+        <div class="stat-card"><div class="sc-label">Next due</div><div class="sc-val">₹4.2L</div><div class="sc-sub warn">In 38 days</div></div>
+        <div class="stat-card"><div class="sc-label">Remaining</div><div class="sc-val">₹42L</div><div class="sc-sub">3 instalments left</div></div>
       </div>
 
       <div class="alert-banner fade-in">
-        <div class="ab-icon">üìÖ</div>
+        <div class="ab-icon">📅</div>
         <div class="ab-content">
-          <div class="ab-title">Upcoming payment ‚Äî 38 days</div>
-          <div class="ab-sub">Slab 7 completion milestone triggers ‚Çπ4,20,000. <span>Expected: 13 June 2026.</span> Set a calendar reminder now.</div>
+          <div class="ab-title">Upcoming payment — 38 days</div>
+          <div class="ab-sub">Slab 7 completion milestone triggers ₹4,20,000. <span>Expected: 13 June 2026.</span> Set a calendar reminder now.</div>
         </div>
         <button class="ab-action" onclick="openReminder()">Set reminder</button>
       </div>
@@ -999,20 +999,20 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
         <table class="pay-table">
           <thead><tr><th>#</th><th>Milestone</th><th>Due date</th><th>Amount</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td style="color:var(--muted)">01</td><td>Booking amount</td><td style="color:var(--muted)">12 Jan 2024</td><td class="pay-table-amt" style="color:var(--green)">‚Çπ11,00,000</td><td><span class="pay-status ps-paid">‚óè Paid</span></td></tr>
-            <tr><td style="color:var(--muted)">02</td><td>On foundation completion</td><td style="color:var(--muted)">5 Apr 2025</td><td class="pay-table-amt" style="color:var(--green)">‚Çπ22,00,000</td><td><span class="pay-status ps-paid">‚óè Paid</span></td></tr>
-            <tr><td style="color:var(--muted)">03</td><td>On podium completion</td><td style="color:var(--muted)">20 Aug 2025</td><td class="pay-table-amt" style="color:var(--green)">‚Çπ35,00,000</td><td><span class="pay-status ps-paid">‚óè Paid</span></td></tr>
-            <tr style="background:rgba(255,176,32,.04)"><td style="color:var(--muted)">04</td><td><strong>On slab 7 completion</strong></td><td style="color:var(--gold);font-weight:600">~13 Jun 2026</td><td class="pay-table-amt" style="color:var(--gold)">‚Çπ4,20,000</td><td><span class="pay-status ps-due">‚ö° Due soon</span></td></tr>
-            <tr><td style="color:var(--muted)">05</td><td>On structure completion</td><td style="color:var(--muted)">Est. Feb 2027</td><td class="pay-table-amt" style="color:var(--muted)">‚Çπ22,00,000</td><td><span class="pay-status ps-upcoming">‚óã Upcoming</span></td></tr>
-            <tr><td style="color:var(--muted)">06</td><td>On possession</td><td style="color:var(--muted)">Est. Aug 2027</td><td class="pay-table-amt" style="color:var(--muted)">‚Çπ16,00,000</td><td><span class="pay-status ps-upcoming">‚óã Upcoming</span></td></tr>
+            <tr><td style="color:var(--muted)">01</td><td>Booking amount</td><td style="color:var(--muted)">12 Jan 2024</td><td class="pay-table-amt" style="color:var(--green)">₹11,00,000</td><td><span class="pay-status ps-paid">● Paid</span></td></tr>
+            <tr><td style="color:var(--muted)">02</td><td>On foundation completion</td><td style="color:var(--muted)">5 Apr 2025</td><td class="pay-table-amt" style="color:var(--green)">₹22,00,000</td><td><span class="pay-status ps-paid">● Paid</span></td></tr>
+            <tr><td style="color:var(--muted)">03</td><td>On podium completion</td><td style="color:var(--muted)">20 Aug 2025</td><td class="pay-table-amt" style="color:var(--green)">₹35,00,000</td><td><span class="pay-status ps-paid">● Paid</span></td></tr>
+            <tr style="background:rgba(255,176,32,.04)"><td style="color:var(--muted)">04</td><td><strong>On slab 7 completion</strong></td><td style="color:var(--gold);font-weight:600">~13 Jun 2026</td><td class="pay-table-amt" style="color:var(--gold)">₹4,20,000</td><td><span class="pay-status ps-due">⚡ Due soon</span></td></tr>
+            <tr><td style="color:var(--muted)">05</td><td>On structure completion</td><td style="color:var(--muted)">Est. Feb 2027</td><td class="pay-table-amt" style="color:var(--muted)">₹22,00,000</td><td><span class="pay-status ps-upcoming">○ Upcoming</span></td></tr>
+            <tr><td style="color:var(--muted)">06</td><td>On possession</td><td style="color:var(--muted)">Est. Aug 2027</td><td class="pay-table-amt" style="color:var(--muted)">₹16,00,000</td><td><span class="pay-status ps-upcoming">○ Upcoming</span></td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ DOCUMENTS VIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <!-- ───── DOCUMENTS VIEW ───── -->
     <div class="view" id="view-documents">
-      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>‚Üê</span> Back to dashboard</button>
+      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>←</span> Back to dashboard</button>
       <div class="page-header fade-in">
         <div><div class="page-title">Document vault</div><div class="page-sub">All your agreements, receipts and possession documents</div></div>
         <div class="page-actions"><button class="btn-sm btn-secondary">Upload document</button></div>
@@ -1021,25 +1021,25 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
         <div class="card fade-in">
           <div class="card-header"><div class="card-title">Agreements</div></div>
           <div class="doc-list">
-            <div class="doc-item"><div class="doc-icon">üìã</div><div class="doc-info"><div class="doc-name">Sale Agreement ‚Äî Flat 14C</div><div class="doc-meta">Signed 12 Jan 2024 ¬∑ Godrej Properties Ltd</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">2.4 MB</div><div class="doc-dl">‚Üì</div></div>
-            <div class="doc-item"><div class="doc-icon">üèõ</div><div class="doc-info"><div class="doc-name">Allotment Letter</div><div class="doc-meta">Issued 14 Jan 2024</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.8 MB</div><div class="doc-dl">‚Üì</div></div>
-            <div class="doc-item"><div class="doc-icon">üìë</div><div class="doc-info"><div class="doc-name">RERA Registration Certificate</div><div class="doc-meta">Project reg. P52100047823 ¬∑ Valid till Dec 2027</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">1.2 MB</div><div class="doc-dl">‚Üì</div></div>
+            <div class="doc-item"><div class="doc-icon">📋</div><div class="doc-info"><div class="doc-name">Sale Agreement — Flat 14C</div><div class="doc-meta">Signed 12 Jan 2024 · Godrej Properties Ltd</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">2.4 MB</div><div class="doc-dl">↓</div></div>
+            <div class="doc-item"><div class="doc-icon">🏛</div><div class="doc-info"><div class="doc-name">Allotment Letter</div><div class="doc-meta">Issued 14 Jan 2024</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.8 MB</div><div class="doc-dl">↓</div></div>
+            <div class="doc-item"><div class="doc-icon">📑</div><div class="doc-info"><div class="doc-name">RERA Registration Certificate</div><div class="doc-meta">Project reg. P52100047823 · Valid till Dec 2027</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">1.2 MB</div><div class="doc-dl">↓</div></div>
           </div>
         </div>
         <div class="card fade-in">
           <div class="card-header"><div class="card-title">Payment receipts</div></div>
           <div class="doc-list">
-            <div class="doc-item"><div class="doc-icon">üßæ</div><div class="doc-info"><div class="doc-name">Receipt ‚Äî Booking amount ‚Çπ11L</div><div class="doc-meta">Issued 12 Jan 2024</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.3 MB</div><div class="doc-dl">‚Üì</div></div>
-            <div class="doc-item"><div class="doc-icon">üßæ</div><div class="doc-info"><div class="doc-name">Receipt ‚Äî Foundation completion ‚Çπ22L</div><div class="doc-meta">Issued 5 Apr 2025</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.3 MB</div><div class="doc-dl">‚Üì</div></div>
-            <div class="doc-item"><div class="doc-icon">üßæ</div><div class="doc-info"><div class="doc-name">Receipt ‚Äî Podium completion ‚Çπ35L</div><div class="doc-meta">Issued 20 Aug 2025</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.3 MB</div><div class="doc-dl">‚Üì</div></div>
+            <div class="doc-item"><div class="doc-icon">🧾</div><div class="doc-info"><div class="doc-name">Receipt — Booking amount ₹11L</div><div class="doc-meta">Issued 12 Jan 2024</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.3 MB</div><div class="doc-dl">↓</div></div>
+            <div class="doc-item"><div class="doc-icon">🧾</div><div class="doc-info"><div class="doc-name">Receipt — Foundation completion ₹22L</div><div class="doc-meta">Issued 5 Apr 2025</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.3 MB</div><div class="doc-dl">↓</div></div>
+            <div class="doc-item"><div class="doc-icon">🧾</div><div class="doc-info"><div class="doc-name">Receipt — Podium completion ₹35L</div><div class="doc-meta">Issued 20 Aug 2025</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.3 MB</div><div class="doc-dl">↓</div></div>
           </div>
         </div>
         <div class="card fade-in">
           <div class="card-header"><div class="card-title">Legal and approvals</div></div>
           <div class="doc-list">
-            <div class="doc-item"><div class="doc-icon">‚úÖ</div><div class="doc-info"><div class="doc-name">Approved Building Plan ‚Äî Tower B</div><div class="doc-meta">Municipal Corp of Pune ¬∑ Approved Feb 2023</div></div><div class="doc-tag dt-new">NEW</div><div class="doc-size">4.1 MB</div><div class="doc-dl">‚Üì</div></div>
-            <div class="doc-item"><div class="doc-icon">üîë</div><div class="doc-info"><div class="doc-name">Home Loan Sanction Letter ‚Äî HDFC</div><div class="doc-meta">Loan a/c HL-2024-88823 ¬∑ ‚Çπ75L sanctioned</div></div><div class="doc-tag dt-req">REQUIRED</div><div class="doc-size">1.8 MB</div><div class="doc-dl">‚Üì</div></div>
-            <div class="doc-item"><div class="doc-icon">üìå</div><div class="doc-info"><div class="doc-name">Possession checklist template</div><div class="doc-meta">Use this when you take possession ¬∑ Aug 2027</div></div><div class="doc-tag dt-old">DOCX</div><div class="doc-size">0.2 MB</div><div class="doc-dl">‚Üì</div></div>
+            <div class="doc-item"><div class="doc-icon">✅</div><div class="doc-info"><div class="doc-name">Approved Building Plan — Tower B</div><div class="doc-meta">Municipal Corp of Pune · Approved Feb 2023</div></div><div class="doc-tag dt-new">NEW</div><div class="doc-size">4.1 MB</div><div class="doc-dl">↓</div></div>
+            <div class="doc-item"><div class="doc-icon">🔑</div><div class="doc-info"><div class="doc-name">Home Loan Sanction Letter — HDFC</div><div class="doc-meta">Loan a/c HL-2024-88823 · ₹75L sanctioned</div></div><div class="doc-tag dt-req">REQUIRED</div><div class="doc-size">1.8 MB</div><div class="doc-dl">↓</div></div>
+            <div class="doc-item"><div class="doc-icon">📌</div><div class="doc-info"><div class="doc-name">Possession checklist template</div><div class="doc-meta">Use this when you take possession · Aug 2027</div></div><div class="doc-tag dt-old">DOCX</div><div class="doc-size">0.2 MB</div><div class="doc-dl">↓</div></div>
           </div>
         </div>
       </div>
@@ -1048,21 +1048,21 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
   </main>
 </div>
 
-<!-- ‚ïê‚ïê REMINDER MODAL ‚ïê‚ïê -->
+<!-- ══ REMINDER MODAL ══ -->
 <div class="modal-overlay" id="reminderModal">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">Set payment reminder</div>
-      <div class="modal-close" onclick="closeReminder()">‚úï</div>
+      <div class="modal-close" onclick="closeReminder()">✕</div>
     </div>
     <div class="modal-body">
       <div class="rm-payment-card">
-        <div class="rm-pay-icon">‚ö°</div>
+        <div class="rm-pay-icon">⚡</div>
         <div class="rm-pay-info">
           <div class="rm-pay-name">Slab 7 completion</div>
           <div class="rm-pay-meta">Expected due date: ~13 June 2026</div>
         </div>
-        <div class="rm-pay-amt">‚Çπ4.2L</div>
+        <div class="rm-pay-amt">₹4.2L</div>
       </div>
       <div class="form-group">
         <label class="form-label">Remind me on</label>
@@ -1083,10 +1083,10 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
       <div class="form-group">
         <label class="form-label">Notify via</label>
         <div class="notify-options">
-          <div class="notify-chip selected" onclick="toggleChip(this)">üìß Email</div>
-          <div class="notify-chip selected" onclick="toggleChip(this)">üì± Push notification</div>
-          <div class="notify-chip" onclick="toggleChip(this)">üí¨ WhatsApp</div>
-          <div class="notify-chip" onclick="toggleChip(this)">üìÖ Google Calendar</div>
+          <div class="notify-chip selected" onclick="toggleChip(this)">📧 Email</div>
+          <div class="notify-chip selected" onclick="toggleChip(this)">📱 Push notification</div>
+          <div class="notify-chip" onclick="toggleChip(this)">💬 WhatsApp</div>
+          <div class="notify-chip" onclick="toggleChip(this)">📅 Google Calendar</div>
         </div>
       </div>
       <div class="form-group">
@@ -1096,21 +1096,21 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
     </div>
     <div class="modal-footer">
       <button class="btn-sm btn-secondary" onclick="closeReminder()">Cancel</button>
-      <button class="btn-sm btn-primary" onclick="saveReminder()">Save reminder ‚Üí</button>
+      <button class="btn-sm btn-primary" onclick="saveReminder()">Save reminder →</button>
     </div>
   </div>
 </div>
 
-<!-- ‚ïê‚ïê CHAT MODAL ‚ïê‚ïê -->
+<!-- ══ CHAT MODAL ══ -->
 <div class="modal-overlay chat-modal" id="chatModal">
   <div class="modal">
     <div class="chat-builder-header">
-      <div class="chat-avatar">üèó</div>
+      <div class="chat-avatar">🏗</div>
       <div>
-        <div class="chat-builder-name">Godrej Properties ‚Äî Site Team</div>
+        <div class="chat-builder-name">Godrej Properties — Site Team</div>
         <div class="chat-builder-status"><span class="chat-online-dot"></span>Usually replies within 2 hours</div>
       </div>
-      <div class="chat-close-btn" onclick="closeChat()">‚úï</div>
+      <div class="chat-close-btn" onclick="closeChat()">✕</div>
     </div>
     <div class="modal-body" id="chatMessages">
       <!-- builder messages -->
@@ -1130,24 +1130,24 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;b
       <button class="chat-qbtn" onclick="sendQuick('Is my possession date still August 2027?')">Confirm possession date</button>
     </div>
     <div class="chat-input-wrap">
-      <textarea class="chat-input" id="chatInput" placeholder="Type your message‚Ä¶" rows="1" onkeydown="handleChatKey(event)"></textarea>
-      <button class="chat-send-btn" onclick="sendMessage()">‚û§</button>
+      <textarea class="chat-input" id="chatInput" placeholder="Type your message…" rows="1" onkeydown="handleChatKey(event)"></textarea>
+      <button class="chat-send-btn" onclick="sendMessage()">➤</button>
     </div>
   </div>
 </div>
 
-<!-- ‚ïê‚ïê TOAST CONTAINER ‚ïê‚ïê -->
+<!-- ══ TOAST CONTAINER ══ -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-// ‚îÄ‚îÄ COUNTDOWN ‚îÄ‚îÄ
+// ── COUNTDOWN ──
 const diff = Math.ceil((new Date('2027-08-31') - new Date()) / 864e5);
 ['cdMain','statDays'].forEach(id => {
   const el = document.getElementById(id);
   if(el) el.textContent = diff;
 });
 
-// ‚îÄ‚îÄ SIDEBAR NAV ‚îÄ‚îÄ
+// ── SIDEBAR NAV ──
 function switchView(name, el) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
@@ -1173,11 +1173,11 @@ window.addEventListener('load', () => {
   }, 300);
 });
 
-// ‚îÄ‚îÄ PROJECT SWITCHER ‚îÄ‚îÄ
+// ── PROJECT SWITCHER ──
 const projects = [
-  { name:'Godrej Meridian', sub:'Tower B ¬∑ Flat 14C ¬∑ Pune', pct:'62%', status:'+8% this month', paid:'‚Çπ68L', dot:'#2B7FFF', days:'2027-08-31' },
-  { name:'DLF The Crest', sub:'Phase 3 ¬∑ Unit 8B ¬∑ Gurugram', pct:'41%', status:'+5% this month', paid:'‚Çπ55L', dot:'#00E5A0', days:'2028-03-15' },
-  { name:'Lodha Palava', sub:'Wing C ¬∑ Flat 22A ¬∑ Mumbai', pct:'78%', status:'+12% this month', paid:'‚Çπ90L', dot:'#FFB020', days:'2026-12-20' },
+  { name:'Godrej Meridian', sub:'Tower B · Flat 14C · Pune', pct:'62%', status:'+8% this month', paid:'₹68L', dot:'#2B7FFF', days:'2027-08-31' },
+  { name:'DLF The Crest', sub:'Phase 3 · Unit 8B · Gurugram', pct:'41%', status:'+5% this month', paid:'₹55L', dot:'#00E5A0', days:'2028-03-15' },
+  { name:'Lodha Palava', sub:'Wing C · Flat 22A · Mumbai', pct:'78%', status:'+12% this month', paid:'₹90L', dot:'#FFB020', days:'2026-12-20' },
 ];
 let currentProject = 0;
 
@@ -1216,25 +1216,25 @@ function switchProject(idx, e) {
     if(i === idx) {
       const chk = document.createElement('div');
       chk.className = 'proj-opt-check';
-      chk.textContent = '‚úì';
+      chk.textContent = '✓';
       o.appendChild(chk);
     }
   });
   document.getElementById('projDropdown').classList.remove('open');
 }
 
-// ‚îÄ‚îÄ TOAST ‚îÄ‚îÄ
+// ── TOAST ──
 function showToast(icon, title, sub, duration=4000) {
   const tc = document.getElementById('toastContainer');
   const t = document.createElement('div');
   t.className = 'toast';
-  t.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-text"><div class="toast-title">${title}</div><div class="toast-sub">${sub}</div></div><div class="toast-close" onclick="this.parentElement.remove()">‚úï</div>`;
+  t.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-text"><div class="toast-title">${title}</div><div class="toast-sub">${sub}</div></div><div class="toast-close" onclick="this.parentElement.remove()">✕</div>`;
   tc.appendChild(t);
   requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 350); }, duration);
 }
 
-// ‚îÄ‚îÄ REMINDER MODAL ‚îÄ‚îÄ
+// ── REMINDER MODAL ──
 function openReminder() {
   // set default date to 2 weeks before payment
   const d = new Date('2026-06-13');
@@ -1252,14 +1252,14 @@ function saveReminder() {
   const date = document.getElementById('reminderDate').value;
   const formatted = date ? new Date(date).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}) : '30 May 2026';
   closeReminder();
-  setTimeout(() => showToast('‚úÖ', 'Reminder saved', `You will be reminded on ${formatted} about the ‚Çπ4.2L payment due.`), 200);
+  setTimeout(() => showToast('✅', 'Reminder saved', `You will be reminded on ${formatted} about the ₹4.2L payment due.`), 200);
 }
 // close modal on overlay click
 document.getElementById('reminderModal').addEventListener('click', function(e) {
   if(e.target === this) closeReminder();
 });
 
-// ‚îÄ‚îÄ CHAT MODAL ‚îÄ‚îÄ
+// ── CHAT MODAL ──
 function openChat() {
   document.getElementById('chatModal').classList.add('open');
   setTimeout(() => scrollChat(), 100);
@@ -1298,7 +1298,7 @@ function showTyping() {
 }
 
 const builderReplies = {
-  'slab 14c': 'Slab 14 was poured on 2nd May 2026. Your flat 14C will be marked complete once the slab cures and column work is inspected ‚Äî expected by end of May 2026.',
+  'slab 14c': 'Slab 14 was poured on 2nd May 2026. Your flat 14C will be marked complete once the slab cures and column work is inspected — expected by end of May 2026.',
   'floor count': 'As of today Tower B has reached floor 14. Structural work is ongoing for floors 14 to 16. We expect to top out the structure by September 2026.',
   'possession': 'Your possession date is confirmed as 31 August 2027, subject to RERA timelines. Any changes will be notified 90 days in advance through this platform.',
   'default': 'Thank you for your message. Our site coordination team will review this and get back to you within 2 working hours. For urgent matters you can also call +91 98200 11223.',
