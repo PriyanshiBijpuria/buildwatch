@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buildwatch ‚Äî Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#040810;
+  --s1:#070D1A;
+  --s2:#0C1424;
+  --s3:#101C30;
+  --border:#112040;
+  --border2:#0E1A30;
+  --text:#E8F0FF;
+  --text2:#A8C0D8;
+  --muted:#4A6080;
+  --faint:#0A1828;
+  --accent:#2B7FFF;
+  --accent2:#00D4FF;
+  --gold:#FFB020;
+  --green:#00E5A0;
+  --red:#FF4560;
+  --sidebar:220px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+
+/* ‚îÄ‚îÄ LAYOUT ‚îÄ‚îÄ */
+.app{display:grid;grid-template-columns:var(--sidebar) 1fr;grid-template-rows:56px 1fr;height:100vh;overflow:hidden}
+
+/* ‚îÄ‚îÄ TOPBAR ‚îÄ‚îÄ */
+.topbar{
+  grid-column:1/-1;
+  background:var(--s1);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 24px;
+  gap:16px;
+  position:relative;
+  z-index:50;
+}
+.tb-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px;margin-right:8px;text-decoration:none;color:var(--text)}
+.tb-pulse{width:6px;height:6px;background:var(--accent2);border-radius:50%;box-shadow:0 0 8px var(--accent2);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.tb-divider{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.tb-project-switcher{
+  display:flex;align-items:center;gap:10px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:10px;padding:6px 14px;
+  cursor:pointer;transition:border-color .2s;
+  position:relative;
+}
+.tb-project-switcher:hover{border-color:rgba(43,127,255,.4)}
+.tb-proj-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;box-shadow:0 0 6px rgba(43,127,255,.5)}
+.tb-proj-name{font-size:13px;font-weight:500}
+.tb-proj-sub{font-size:11px;color:var(--muted)}
+.tb-caret{font-size:10px;color:var(--muted);margin-left:6px}
+/* project dropdown */
+.proj-dropdown{
+  position:absolute;top:calc(100% + 8px);left:0;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:12px;padding:6px;
+  min-width:240px;
+  z-index:200;
+  display:none;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.proj-dropdown.open{display:block;animation:fadeDown .15s ease}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.proj-opt{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:8px;cursor:pointer;
+  transition:background .15s;
+}
+.proj-opt:hover{background:var(--s3)}
+.proj-opt.active{background:rgba(43,127,255,.08)}
+.proj-opt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.proj-opt-info .proj-opt-name{font-size:13px;font-weight:500}
+.proj-opt-info .proj-opt-meta{font-size:11px;color:var(--muted)}
+.proj-opt-check{margin-left:auto;color:var(--accent2);font-size:13px}
+.tb-spacer{flex:1}
+.tb-notif{
+  width:34px;height:34px;border-radius:10px;
+  background:var(--s2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;transition:border-color .2s;
+  position:relative;
+}
+.tb-notif:hover{border-color:rgba(43,127,255,.4)}
+.notif-badge{
+  position:absolute;top:-3px;right:-3px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--red);
+  font-size:9px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;border:2px solid var(--bg);
+}
+.tb-avatar{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),#1A60E0);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff;
+  cursor:pointer;
+  box-shadow:0 0 12px rgba(43,127,255,.3);
+}
+
+/* ‚îÄ‚îÄ SIDEBAR ‚îÄ‚îÄ */
+.sidebar{
+  background:var(--s1);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:16px 0;
+}
+.sidebar::-webkit-scrollbar{width:0}
+.sb-section{padding:0 10px;margin-bottom:20px}
+.sb-label{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0 10px;margin-bottom:8px}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:10px;
+  font-size:13px;font-weight:500;color:var(--muted);
+  cursor:pointer;transition:all .15s;
+  margin-bottom:2px;
+  border:1px solid transparent;
+}
+.sb-item:hover{background:var(--s2);color:var(--text2)}
+.sb-item.active{background:rgba(43,127,255,.1);color:var(--accent);border-color:rgba(43,127,255,.15)}
+.sb-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.sb-count{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px}
+.sb-count.blue{background:rgba(43,127,255,.2);color:var(--accent)}
+/* mini progress card in sidebar */
+.sb-progress{
+  margin:0 10px 20px;
+  background:linear-gradient(135deg,#060C1A,#0A1428);
+  border:1px solid var(--border);
+  border-radius:14px;padding:16px;
+}
+.sbp-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.sbp-pct{font-family:'Cormorant Garamond',serif;font-size:36px;line-height:1;color:var(--accent);margin-bottom:8px;text-shadow:0 0 20px rgba(43,127,255,.3)}
+.sbp-bar{background:var(--faint);border-radius:4px;height:5px;overflow:hidden;margin-bottom:8px}
+.sbp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 8px rgba(43,127,255,.4)}
+.sbp-sub{font-size:11px;color:var(--muted)}
+.sbp-sub em{color:var(--green);font-style:normal}
+
+/* ‚îÄ‚îÄ MAIN ‚îÄ‚îÄ */
+.main{
+  overflow-y:auto;overflow-x:hidden;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+}
+.main::-webkit-scrollbar{width:5px}
+.main::-webkit-scrollbar-track{background:transparent}
+.main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ‚îÄ‚îÄ VIEWS (tabs) ‚îÄ‚îÄ */
+.view{display:none;padding:28px 32px;flex-direction:column;gap:24px;flex:1}
+.view.active{display:flex}
+
+/* ‚îÄ‚îÄ PAGE HEADER ‚îÄ‚îÄ */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:-.01em;line-height:1}
+.page-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.page-actions{display:flex;gap:10px;align-items:center;flex-shrink:0}
+.btn-sm{padding:8px 18px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;border:none;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 0 16px rgba(43,127,255,.25)}
+.btn-primary:hover{transform:scale(1.03);box-shadow:0 0 28px rgba(43,127,255,.45)}
+.btn-secondary{background:var(--s2);color:var(--text2);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:rgba(43,127,255,.3);color:var(--text)}
+
+/* ‚îÄ‚îÄ ALERT BANNER ‚îÄ‚îÄ */
+.alert-banner{
+  background:rgba(255,176,32,.06);
+  border:1px solid rgba(255,176,32,.2);
+  border-radius:14px;padding:14px 20px;
+  display:flex;align-items:center;gap:14px;
+  animation:slideIn .4s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.ab-icon{font-size:20px;flex-shrink:0}
+.ab-content{flex:1}
+.ab-title{font-weight:600;font-size:14px;color:var(--text);margin-bottom:2px}
+.ab-sub{font-size:13px;color:var(--muted)}
+.ab-sub span{color:var(--gold);font-weight:500}
+.ab-action{background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.25);color:var(--gold);border-radius:100px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}
+.ab-action:hover{background:rgba(255,176,32,.2)}
+
+/* ‚îÄ‚îÄ STAT CARDS ‚îÄ‚îÄ */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:16px;padding:20px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s;
+}
+.stat-card:hover{border-color:rgba(43,127,255,.25);transform:translateY(-2px)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(43,127,255,.3),transparent);opacity:0;transition:opacity .3s}
+.stat-card:hover::before{opacity:1}
+.sc-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.sc-val{font-family:'Cormorant Garamond',serif;font-size:38px;line-height:1;color:var(--text);margin-bottom:6px}
+.sc-sub{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.sc-sub.up{color:var(--green)}.sc-sub.warn{color:var(--gold)}.sc-sub.live{color:var(--accent2)}
+.sc-glow{position:absolute;bottom:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.06;pointer-events:none}
+
+/* ‚îÄ‚îÄ CONTENT GRID ‚îÄ‚îÄ */
+.content-grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
+.content-grid-full{display:grid;grid-template-columns:1fr;gap:20px}
+
+/* ‚îÄ‚îÄ CARD ‚îÄ‚îÄ */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.01em}
+.card-action{font-size:12px;color:var(--accent2);cursor:pointer;font-weight:500;transition:opacity .2s}
+.card-action:hover{opacity:.7}
+
+/* ‚îÄ‚îÄ MILESTONE TIMELINE ‚îÄ‚îÄ */
+.timeline{position:relative;display:flex;flex-direction:column}
+.tl-item{display:flex;gap:16px;position:relative}
+.tl-item::before{content:'';position:absolute;left:15px;top:32px;bottom:-8px;width:2px;background:var(--border2)}
+.tl-item:last-child::before{display:none}
+.tl-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;z-index:1}
+.tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;border:2px solid transparent}
+.tl-done{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3);color:var(--green)}
+.tl-active{background:rgba(43,127,255,.12);border-color:var(--accent);color:var(--accent);animation:pulseDot 2s infinite}
+@keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 rgba(43,127,255,.4)}50%{box-shadow:0 0 0 8px rgba(43,127,255,0)}}
+.tl-pending{background:var(--faint);border-color:var(--border);color:var(--muted)}
+.tl-content{padding:4px 0 24px;flex:1}
+.tl-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px}
+.tl-name{font-size:14px;font-weight:500;color:var(--text)}
+.tl-name.dim{color:var(--muted);font-weight:400}
+.tl-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;white-space:nowrap;flex-shrink:0}
+.tag-done{background:rgba(0,229,160,.1);color:var(--green)}
+.tag-active{background:rgba(43,127,255,.12);color:var(--accent)}
+.tag-soon{background:var(--faint);color:var(--muted)}
+.tl-meta{font-size:12px;color:var(--muted)}
+.tl-desc{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+
+/* PROGRESS BAR */
+.prog-wrap{margin-bottom:20px}
+.prog-label-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px}
+.prog-label-row span:last-child{color:var(--green);font-weight:600}
+.prog-track{background:var(--faint);border-radius:6px;height:8px;overflow:hidden}
+.prog-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 10px rgba(43,127,255,.3);transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+
+/* ‚îÄ‚îÄ COUNTDOWN ‚îÄ‚îÄ */
+.countdown-card{
+  background:linear-gradient(160deg,#060C1C,#0A1430);
+  border:1px solid rgba(43,127,255,.2);
+  border-radius:16px;padding:24px;
+  text-align:center;
+  box-shadow:inset 0 0 30px rgba(43,127,255,.04);
+}
+.cd-eyebrow{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.cd-num{font-family:'Cormorant Garamond',serif;font-size:72px;line-height:1;color:var(--accent);margin-bottom:4px;text-shadow:0 0 30px rgba(43,127,255,.35)}
+.cd-unit{font-size:13px;color:var(--muted);margin-bottom:16px}
+.cd-date{font-size:12px;color:var(--muted);background:rgba(43,127,255,.06);border-radius:10px;padding:10px;border:1px solid rgba(43,127,255,.1)}
+.cd-date strong{color:var(--text);font-weight:500}
+
+/* ‚îÄ‚îÄ PAYMENT SCHEDULE ‚îÄ‚îÄ */
+.pay-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border2);transition:background .15s}
+.pay-item:last-child{border-bottom:none}
+.pay-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.pay-info{flex:1}
+.pay-name{font-size:13px;font-weight:500;margin-bottom:2px}
+.pay-date{font-size:11px;color:var(--muted)}
+.pay-amt{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300}
+.pay-amt.paid{color:var(--green)}.pay-amt.due{color:var(--gold)}.pay-amt.upcoming{color:var(--muted)}
+.pay-due-row{
+  background:rgba(255,176,32,.05);
+  border:1px solid rgba(255,176,32,.15);
+  border-radius:10px;
+  margin:0 -24px;padding:14px 24px;
+}
+.pay-due-row .pay-date{color:var(--gold);font-weight:600}
+
+/* ‚îÄ‚îÄ PHOTO FEED ‚îÄ‚îÄ */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.photo-thumb{
+  border-radius:12px;overflow:hidden;
+  aspect-ratio:4/3;
+  background:var(--faint);
+  border:1px solid var(--border);
+  position:relative;cursor:pointer;
+  transition:transform .2s,border-color .2s;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:6px;
+}
+.photo-thumb:hover{transform:scale(1.02);border-color:rgba(43,127,255,.3)}
+.photo-emoji{font-size:28px}
+.photo-label{font-size:10px;color:var(--muted);font-weight:500;text-align:center;padding:0 8px}
+.photo-date{
+  position:absolute;bottom:8px;left:8px;
+  background:rgba(4,8,16,.75);
+  color:rgba(232,240,255,.7);
+  font-size:10px;font-weight:500;
+  padding:3px 8px;border-radius:5px;
+  backdrop-filter:blur(4px);
+}
+.photo-new{
+  position:absolute;top:8px;right:8px;
+  background:var(--accent);
+  color:#fff;font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:100px;
+  font-family:'Syne',sans-serif;letter-spacing:.04em;
+}
+/* photo color variants */
+.pt1{background:linear-gradient(135deg,#0A1428,#0E1C34)}
+.pt2{background:linear-gradient(135deg,#0A1A28,#0C2030)}
+.pt3{background:linear-gradient(135deg,#0E1420,#121C2E)}
+.pt4{background:linear-gradient(135deg,#060E1C,#0A1428)}
+.pt5{background:linear-gradient(135deg,#0C1628,#101E34)}
+.pt6{background:linear-gradient(135deg,#080E1A,#0C1828)}
+
+/* ‚îÄ‚îÄ DOCUMENT VAULT ‚îÄ‚îÄ */
+.doc-list{display:flex;flex-direction:column;gap:8px}
+.doc-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;
+  background:var(--faint);border:1px solid var(--border2);
+  border-radius:12px;cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.doc-item:hover{background:var(--s2);border-color:rgba(43,127,255,.25)}
+.doc-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center}
+.doc-info{flex:1}
+.doc-name{font-size:14px;font-weight:500;margin-bottom:2px}
+.doc-meta{font-size:11px;color:var(--muted)}
+.doc-size{font-size:11px;color:var(--muted);flex-shrink:0}
+.doc-dl{
+  width:30px;height:30px;border-radius:8px;
+  background:rgba(43,127,255,.08);
+  border:1px solid rgba(43,127,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;transition:all .2s;
+}
+.doc-item:hover .doc-dl{background:rgba(43,127,255,.18);border-color:var(--accent)}
+.doc-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.04em;flex-shrink:0}
+.dt-new{background:rgba(0,229,160,.1);color:var(--green)}
+.dt-req{background:rgba(255,176,32,.1);color:var(--gold)}
+.dt-old{background:var(--faint);color:var(--muted);border:1px solid var(--border)}
+
+/* ‚îÄ‚îÄ OVERVIEW RIGHT COLUMN ‚îÄ‚îÄ */
+.right-stack{display:flex;flex-direction:column;gap:16px}
+
+/* ‚îÄ‚îÄ TABS (for sections within pages) ‚îÄ‚îÄ */
+.seg-tabs{display:flex;gap:2px;background:var(--faint);border-radius:10px;padding:3px;width:fit-content;margin-bottom:20px}
+.seg-tab{padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;border:none;background:none;font-family:'DM Sans',sans-serif}
+.seg-tab.active{background:var(--s2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+/* ‚îÄ‚îÄ PHOTO VIEW (full page) ‚îÄ‚îÄ */
+.photo-grid-lg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.photo-thumb-lg{
+  border-radius:14px;overflow:hidden;
+  aspect-ratio:4/3;
+  background:var(--faint);
+  border:1px solid var(--border);
+  position:relative;cursor:pointer;
+  transition:transform .2s,border-color .2s;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;
+}
+.photo-thumb-lg:hover{transform:scale(1.02);border-color:rgba(43,127,255,.3)}
+.photo-thumb-lg .photo-emoji{font-size:36px}
+.photo-thumb-lg .photo-label{font-size:12px}
+
+/* ‚îÄ‚îÄ PAYMENTS VIEW ‚îÄ‚îÄ */
+.pay-table{width:100%;border-collapse:collapse}
+.pay-table th{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 16px 12px;border-bottom:1px solid var(--border)}
+.pay-table td{padding:14px 16px;border-bottom:1px solid var(--border2);font-size:13px;vertical-align:middle}
+.pay-table tr:last-child td{border-bottom:none}
+.pay-table tr:hover td{background:rgba(43,127,255,.03)}
+.pay-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px}
+.ps-paid{background:rgba(0,229,160,.1);color:var(--green)}
+.ps-due{background:rgba(255,176,32,.1);color:var(--gold)}
+.ps-upcoming{background:var(--faint);color:var(--muted)}
+.pay-table-amt{font-family:'Cormorant Garamond',serif;font-size:17px}
+
+/* ‚îÄ‚îÄ BACK BUTTON ‚îÄ‚îÄ */
+.back-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:12px;font-weight:600;color:var(--muted);
+  background:var(--faint);border:1px solid var(--border);
+  border-radius:100px;padding:6px 14px;
+  cursor:pointer;transition:all .2s;margin-bottom:20px;
+  font-family:'DM Sans',sans-serif;
+}
+.back-btn:hover{color:var(--text);border-color:rgba(43,127,255,.3);background:var(--s2)}
+.back-btn span{font-size:14px;line-height:1}
+
+/* ‚îÄ‚îÄ PHOTO REAL IMAGES ‚îÄ‚îÄ */
+.photo-thumb-lg{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--border);cursor:pointer;transition:transform .2s,border-color .2s;display:block;background:var(--faint)}
+.photo-thumb-lg:hover{transform:scale(1.02);border-color:rgba(43,127,255,.3)}
+.photo-thumb-lg img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.photo-thumb-lg:hover img{transform:scale(1.05)}
+.photo-thumb-lg .photo-date{position:absolute;bottom:8px;left:8px;background:rgba(4,8,16,.78);color:rgba(232,240,255,.75);font-size:10px;font-weight:500;padding:3px 8px;border-radius:5px;backdrop-filter:blur(4px)}
+.photo-thumb-lg .photo-new{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;font-family:'Syne',sans-serif;letter-spacing:.04em}
+.photo-thumb-lg .photo-caption{position:absolute;bottom:0;left:0;right:0;padding:28px 12px 10px;background:linear-gradient(to top,rgba(4,8,16,.85),transparent);font-size:11px;color:rgba(232,240,255,.8);font-weight:500}
+/* overview small grid real images */
+.photo-thumb{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--border);cursor:pointer;transition:transform .2s,border-color .2s;display:block;background:var(--faint)}
+.photo-thumb:hover{transform:scale(1.02);border-color:rgba(43,127,255,.3)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.photo-thumb:hover img{transform:scale(1.05)}
+.photo-thumb .photo-date{position:absolute;bottom:7px;left:7px;background:rgba(4,8,16,.75);color:rgba(232,240,255,.7);font-size:10px;padding:2px 7px;border-radius:4px;backdrop-filter:blur(4px)}
+.photo-thumb .photo-new{position:absolute;top:6px;right:6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;font-family:'Syne',sans-serif}
+
+/* ‚îÄ‚îÄ MODAL OVERLAY ‚îÄ‚îÄ */
+.modal-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(4,8,16,.85);
+  backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
+}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:20px;
+  width:min(480px,92vw);
+  box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(43,127,255,.08);
+  transform:translateY(20px) scale(.97);
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.modal-overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-header{
+  padding:22px 24px 18px;
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px}
+.modal-close{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--faint);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;color:var(--muted);
+  transition:all .15s;
+}
+.modal-close:hover{background:var(--s2);color:var(--text)}
+.modal-body{padding:24px}
+
+/* ‚îÄ‚îÄ REMINDER MODAL ‚îÄ‚îÄ */
+.rm-payment-card{
+  background:rgba(255,176,32,.05);
+  border:1px solid rgba(255,176,32,.2);
+  border-radius:12px;padding:14px 16px;
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:22px;
+}
+.rm-pay-icon{font-size:20px}
+.rm-pay-info .rm-pay-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.rm-pay-info .rm-pay-meta{font-size:12px;color:var(--muted)}
+.rm-pay-amt{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);margin-left:auto}
+.form-group{margin-bottom:18px}
+.form-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:block}
+.form-input{
+  width:100%;background:var(--faint);border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;
+  font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(43,127,255,.12)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.notify-options{display:flex;gap:8px;flex-wrap:wrap}
+.notify-chip{
+  padding:7px 14px;border-radius:100px;
+  font-size:12px;font-weight:600;
+  border:1px solid var(--border);background:var(--faint);color:var(--muted);
+  cursor:pointer;transition:all .15s;
+}
+.notify-chip.selected{background:rgba(43,127,255,.12);border-color:var(--accent);color:var(--accent)}
+.modal-footer{
+  padding:16px 24px 24px;
+  display:flex;gap:10px;justify-content:flex-end;
+}
+
+/* ‚îÄ‚îÄ CHAT INTERFACE ‚îÄ‚îÄ */
+.chat-modal .modal{width:min(440px,92vw);height:min(600px,85vh);display:flex;flex-direction:column}
+.chat-modal .modal-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+.chat-modal .modal-body::-webkit-scrollbar{width:4px}
+.chat-modal .modal-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.chat-builder-header{
+  padding:16px 20px;
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:12px;
+}
+.chat-avatar{
+  width:40px;height:40px;border-radius:12px;
+  background:linear-gradient(135deg,#1A3060,#0A2040);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.chat-builder-name{font-family:'Syne',sans-serif;font-weight:700;font-size:14px}
+.chat-builder-status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:5px}
+.chat-online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.chat-close-btn{margin-left:auto;width:28px;height:28px;border-radius:8px;background:var(--faint);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--muted);transition:all .15s}
+.chat-close-btn:hover{background:var(--s2);color:var(--text)}
+/* messages */
+.msg{display:flex;flex-direction:column;gap:3px;max-width:82%}
+.msg.me{align-self:flex-end;align-items:flex-end}
+.msg.them{align-self:flex-start;align-items:flex-start}
+.msg-bubble{
+  padding:10px 14px;border-radius:14px;
+  font-size:13px;line-height:1.5;
+}
+.msg.them .msg-bubble{
+  background:var(--s2);border:1px solid var(--border2);
+  border-radius:4px 14px 14px 14px;color:var(--text);
+}
+.msg.me .msg-bubble{
+  background:var(--accent);color:#fff;
+  border-radius:14px 4px 14px 14px;
+}
+.msg-time{font-size:10px;color:var(--muted);padding:0 4px}
+.msg-sender{font-size:10px;color:var(--muted);font-weight:600;padding:0 4px;text-transform:uppercase;letter-spacing:.04em}
+.chat-typing{display:flex;align-items:center;gap:4px;padding:10px 14px;background:var(--s2);border:1px solid var(--border2);border-radius:4px 14px 14px 14px;width:fit-content}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typingBounce 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+/* chat input */
+.chat-input-wrap{
+  padding:14px 16px;
+  border-top:1px solid var(--border2);
+  display:flex;gap:10px;align-items:flex-end;
+  flex-shrink:0;
+}
+.chat-input{
+  flex:1;background:var(--faint);border:1px solid var(--border);
+  border-radius:12px;padding:10px 14px;
+  font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;
+  outline:none;resize:none;max-height:100px;min-height:40px;
+  transition:border-color .2s;line-height:1.4;
+}
+.chat-input:focus{border-color:var(--accent)}
+.chat-send-btn{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:var(--accent);border:none;color:#fff;
+  font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,box-shadow .15s;
+  box-shadow:0 0 12px rgba(43,127,255,.3);
+}
+.chat-send-btn:hover{transform:scale(1.07);box-shadow:0 0 20px rgba(43,127,255,.5)}
+.chat-quick-btns{padding:0 16px 12px;display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0}
+.chat-qbtn{
+  padding:6px 12px;border-radius:100px;
+  font-size:11px;font-weight:600;
+  border:1px solid rgba(43,127,255,.2);
+  background:rgba(43,127,255,.06);
+  color:var(--accent2);cursor:pointer;transition:all .15s;
+  font-family:'DM Sans',sans-serif;
+}
+.chat-qbtn:hover{background:rgba(43,127,255,.14);border-color:var(--accent)}
+
+/* ‚îÄ‚îÄ TOAST ‚îÄ‚îÄ */
+.toast-container{position:fixed;bottom:28px;right:28px;z-index:2000;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:14px;padding:14px 18px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  min-width:280px;max-width:360px;
+  transform:translateX(120%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  pointer-events:auto;
+}
+.toast.show{transform:translateX(0)}
+.toast-icon{font-size:18px;flex-shrink:0}
+.toast-text{flex:1}
+.toast-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.toast-sub{font-size:12px;color:var(--muted)}
+.toast-close{font-size:14px;color:var(--muted);cursor:pointer;flex-shrink:0;line-height:1}
+
+/* ‚îÄ‚îÄ ANIMATIONS ‚îÄ‚îÄ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .35s ease both}
+.fade-in:nth-child(1){animation-delay:.05s}
+.fade-in:nth-child(2){animation-delay:.1s}
+.fade-in:nth-child(3){animation-delay:.15s}
+.fade-in:nth-child(4){animation-delay:.2s}
+
+/* ‚îÄ‚îÄ GRAIN ‚îÄ‚îÄ */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");z-index:9999}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}
+  .sidebar{display:none}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .content-grid{grid-template-columns:1fr}
+  .photo-grid-lg{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ‚ïê‚ïê TOPBAR ‚ïê‚ïê -->
+  <header class="topbar">
+    <a class="tb-logo" href="buildwatch-v4.html"><span class="tb-pulse"></span>Buildwatch</a>
+    <div class="tb-divider"></div>
+    <div class="tb-project-switcher" id="projSwitcher" onclick="toggleDropdown()">
+      <div class="tb-proj-dot" id="tbDot"></div>
+      <div>
+        <div class="tb-proj-name" id="tbProjName">Godrej Meridian</div>
+        <div class="tb-proj-sub" id="tbProjSub">Tower B ¬∑ Flat 14C ¬∑ Pune</div>
+      </div>
+      <div class="tb-caret">‚ñæ</div>
+      <div class="proj-dropdown" id="projDropdown">
+        <div class="proj-opt active" onclick="switchProject(0,event)">
+          <div class="proj-opt-dot" style="background:#2B7FFF"></div>
+          <div class="proj-opt-info">
+            <div class="proj-opt-name">Godrej Meridian</div>
+            <div class="proj-opt-meta">Tower B ¬∑ Flat 14C ¬∑ Pune</div>
+          </div>
+          <div class="proj-opt-check">‚úì</div>
+        </div>
+        <div class="proj-opt" onclick="switchProject(1,event)">
+          <div class="proj-opt-dot" style="background:#00E5A0"></div>
+          <div class="proj-opt-info">
+            <div class="proj-opt-name">DLF The Crest</div>
+            <div class="proj-opt-meta">Phase 3 ¬∑ Unit 8B ¬∑ Gurugram</div>
+          </div>
+        </div>
+        <div class="proj-opt" onclick="switchProject(2,event)">
+          <div class="proj-opt-dot" style="background:#FFB020"></div>
+          <div class="proj-opt-info">
+            <div class="proj-opt-name">Lodha Palava</div>
+            <div class="proj-opt-meta">Wing C ¬∑ Flat 22A ¬∑ Mumbai</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tb-spacer"></div>
+    <div class="tb-notif" title="Notifications"><span>üîî</span><div class="notif-badge">2</div></div>
+    <div class="tb-avatar">PB</div>
+  </header>
+
+  <!-- ‚ïê‚ïê SIDEBAR ‚ïê‚ïê -->
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-progress">
+        <div class="sbp-label">Overall progress</div>
+        <div class="sbp-pct" id="sbPct">62%</div>
+        <div class="sbp-bar"><div class="sbp-fill" id="sbBar" style="width:62%"></div></div>
+        <div class="sbp-sub"><em id="sbStatus">+8% this month</em></div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Overview</div>
+      <div class="sb-item active" data-view="overview" onclick="switchView('overview',this)">
+        <span class="sb-icon">üìä</span>Dashboard
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Construction</div>
+      <div class="sb-item" data-view="construction" onclick="switchView('construction',this)">
+        <span class="sb-icon">üèó</span>Timeline
+      </div>
+      <div class="sb-item" data-view="photos" onclick="switchView('photos',this)">
+        <span class="sb-icon">üì∑</span>Site Photos
+        <span class="sb-count blue">2</span>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Finances</div>
+      <div class="sb-item" data-view="payments" onclick="switchView('payments',this)">
+        <span class="sb-icon">üí≥</span>Payments
+        <span class="sb-count">1</span>
+      </div>
+      <div class="sb-item" data-view="documents" onclick="switchView('documents',this)">
+        <span class="sb-icon">üìÑ</span>Documents
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Account</div>
+      <div class="sb-item" onclick="">
+        <span class="sb-icon">‚öôÔ∏è</span>Settings
+      </div>
+      <div class="sb-item" onclick="window.location.href='buildwatch-v4.html'">
+        <span class="sb-icon">‚Üê</span>Back to site
+      </div>
+    </div>
+  </aside>
+
+  <!-- ‚ïê‚ïê MAIN ‚ïê‚ïê -->
+  <main class="main">
+
+    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ OVERVIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <div class="view active" id="view-overview">
+
+      <div class="page-header fade-in">
+        <div>
+          <div class="page-title">Good morning, Priyanshi üëã</div>
+          <div class="page-sub" id="overviewSub">Here is everything happening with Godrej Meridian right now</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-sm btn-secondary">Share report</button>
+          <button class="btn-sm btn-primary" onclick="openChat()">Contact builder</button>
+        </div>
+      </div>
+
+      <!-- alert -->
+      <div class="alert-banner fade-in">
+        <div class="ab-icon">‚ö°</div>
+        <div class="ab-content">
+          <div class="ab-title">Payment due in 38 days</div>
+          <div class="ab-sub">Slab 7 completion triggers your next instalment of <span>‚Çπ4,20,000</span>. Expected due date: 13 June 2026.</div>
+        </div>
+        <button class="ab-action" onclick="switchView('payments',null)">View payment plan ‚Üí</button>
+      </div>
+
+      <!-- stats -->
+      <div class="stats-row">
+        <div class="stat-card fade-in">
+          <div class="sc-label">Overall progress</div>
+          <div class="sc-val" id="statProgress">62%</div>
+          <div class="sc-sub up">‚Üë +8% since last month</div>
+          <div class="sc-glow" style="background:var(--accent)"></div>
+        </div>
+        <div class="stat-card fade-in">
+          <div class="sc-label">Days to possession</div>
+          <div class="sc-val" id="statDays">‚Äî</div>
+          <div class="sc-sub">Est. 31 Aug 2027</div>
+          <div class="sc-glow" style="background:var(--accent2)"></div>
+        </div>
+        <div class="stat-card fade-in">
+          <div class="sc-label">Amount paid</div>
+          <div class="sc-val" id="statPaid">‚Çπ68L</div>
+          <div class="sc-sub warn">‚Çπ42L remaining</div>
+          <div class="sc-glow" style="background:var(--gold)"></div>
+        </div>
+        <div class="stat-card fade-in">
+          <div class="sc-label">Last site update</div>
+          <div class="sc-val">3d</div>
+          <div class="sc-sub live">‚óè 2 new photos added</div>
+          <div class="sc-glow" style="background:var(--green)"></div>
+        </div>
+      </div>
+
+      <!-- content grid -->
+      <div class="content-grid">
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- milestone card -->
+          <div class="card fade-in">
+            <div class="card-header">
+              <div class="card-title">Construction milestones</div>
+              <div class="card-action" onclick="switchView('construction',null)">Full timeline ‚Üí</div>
+            </div>
+            <div class="prog-wrap">
+              <div class="prog-label-row"><span>Tower B overall completion</span><span>62%</span></div>
+              <div class="prog-track"><div class="prog-fill" id="overviewBar" style="width:0%"></div></div>
+            </div>
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name">Foundation and basement</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Mar 2025 ¬∑ Plinth and waterproofing complete</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name">Podium and parking structure</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Jul 2025 ¬∑ 3 basement levels complete</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 1 to 8 structure</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Nov 2025 ¬∑ Slab casting and column work</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-left"><div class="tl-dot tl-active">üèó</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 9 to 16 ‚Äî Slab 14 just poured</div><div class="tl-tag tag-active">In progress</div></div><div class="tl-meta" style="color:var(--accent)">Your floor is coming up ¬∑ Due Jun 2026</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Brick, block and finishing</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Oct 2026</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+                <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Possession and handover</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Aug 2027</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- recent photos mini -->
+          <div class="card fade-in">
+            <div class="card-header">
+              <div class="card-title">Recent site photos</div>
+              <div class="card-action" onclick="switchView('photos',null)">View all ‚Üí</div>
+            </div>
+            <div class="photo-grid">
+              <div class="photo-thumb">
+                <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80" alt="Slab pour">
+                <div class="photo-date">2 May</div>
+                <div class="photo-new">NEW</div>
+              </div>
+              <div class="photo-thumb">
+                <img src="https://images.unsplash.com/photo-1590644365607-5f31b0a8e6f7?w=400&q=80" alt="Column work">
+                <div class="photo-date">2 May</div>
+                <div class="photo-new">NEW</div>
+              </div>
+              <div class="photo-thumb">
+                <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80" alt="Tower elevation">
+                <div class="photo-date">18 Apr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- right column -->
+        <div class="right-stack">
+          <div class="countdown-card fade-in">
+            <div class="cd-eyebrow">Days to possession</div>
+            <div class="cd-num" id="cdMain">‚Äî</div>
+            <div class="cd-unit">days remaining</div>
+            <div class="cd-date">Expected: <strong>31 August 2027</strong></div>
+          </div>
+
+          <div class="card fade-in">
+            <div class="card-header"><div class="card-title">Payment schedule</div><div class="card-action" onclick="switchView('payments',null)">All ‚Üí</div></div>
+            <div class="pay-item"><div class="pay-dot" style="background:var(--green)"></div><div class="pay-info"><div class="pay-name">Booking amount</div><div class="pay-date">Paid 12 Jan 2024</div></div><div class="pay-amt paid">‚Çπ11L</div></div>
+            <div class="pay-item"><div class="pay-dot" style="background:var(--green)"></div><div class="pay-info"><div class="pay-name">Foundation completion</div><div class="pay-date">Paid 5 Apr 2025</div></div><div class="pay-amt paid">‚Çπ22L</div></div>
+            <div class="pay-item"><div class="pay-dot" style="background:var(--green)"></div><div class="pay-info"><div class="pay-name">Podium completion</div><div class="pay-date">Paid 20 Aug 2025</div></div><div class="pay-amt paid">‚Çπ35L</div></div>
+            <div class="pay-due-row pay-item"><div class="pay-dot" style="background:var(--gold)"></div><div class="pay-info"><div class="pay-name">Slab 7 completion</div><div class="pay-date">Due ~13 Jun 2026</div></div><div class="pay-amt due">‚Çπ4.2L</div></div>
+            <div class="pay-item"><div class="pay-dot" style="background:var(--border)"></div><div class="pay-info"><div class="pay-name">Structure completion</div><div class="pay-date">Est. Feb 2027</div></div><div class="pay-amt upcoming">‚Çπ22L</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ CONSTRUCTION VIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <div class="view" id="view-construction">
+      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>‚Üê</span> Back to dashboard</button>
+      <div class="page-header fade-in">
+        <div><div class="page-title">Construction timeline</div><div class="page-sub">Godrej Meridian ¬∑ Tower B ¬∑ Full milestone history</div></div>
+        <div class="page-actions"><button class="btn-sm btn-secondary">Download report</button></div>
+      </div>
+      <div class="card fade-in">
+        <div class="prog-wrap" style="margin-bottom:28px">
+          <div class="prog-label-row" style="font-size:14px;margin-bottom:10px"><span style="font-weight:500">Tower B overall</span><span style="color:var(--green);font-family:'Cormorant Garamond',serif;font-size:20px">62% complete</span></div>
+          <div class="prog-track" style="height:12px"><div class="prog-fill" id="constructionBar" style="width:0%"></div></div>
+        </div>
+        <div class="timeline">
+          <div class="tl-item fade-in">
+            <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name">Excavation and site preparation</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Oct 2024</div><div class="tl-desc">Site clearing, soil testing, and excavation for basement levels completed on schedule.</div></div>
+          </div>
+          <div class="tl-item fade-in">
+            <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name">Foundation and raft slab</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Mar 2025</div><div class="tl-desc">Raft foundation poured, plinth beam work complete, basement waterproofing applied.</div></div>
+          </div>
+          <div class="tl-item fade-in">
+            <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name">Basement and podium structure (B3 to G)</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Jul 2025</div><div class="tl-desc">3 basement parking levels, podium slab, and ground floor lobby structure complete.</div></div>
+          </div>
+          <div class="tl-item fade-in">
+            <div class="tl-left"><div class="tl-dot tl-done">‚úì</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 1 to 8 ‚Äî Slab and columns</div><div class="tl-tag tag-done">Done</div></div><div class="tl-meta">Completed Nov 2025</div><div class="tl-desc">All slab castings and structural column work for floors 1 through 8 completed ahead of schedule.</div></div>
+          </div>
+          <div class="tl-item fade-in" style="background:rgba(43,127,255,.03);border-radius:12px;padding:8px;margin:-8px">
+            <div class="tl-left"><div class="tl-dot tl-active">üèó</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name">Floors 9 to 16 ‚Äî in progress</div><div class="tl-tag tag-active">Live now</div></div><div class="tl-meta" style="color:var(--accent)">Slab 14 poured on 2 May 2026 ¬∑ Your floor (14C) is next</div><div class="tl-desc" style="color:var(--text2)">Construction team is currently working on floors 9 to 16. Slab 14 was poured this week. Your unit on floor 14C is in this section. Expected completion by June 2026.</div></div>
+          </div>
+          <div class="tl-item fade-in">
+            <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Floors 17 to 24 ‚Äî upper structure</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Jun‚ÄìSep 2026</div></div>
+          </div>
+          <div class="tl-item fade-in">
+            <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Brick, block work and plastering</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Oct 2026</div></div>
+          </div>
+          <div class="tl-item fade-in">
+            <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Flooring, paint and fit-outs</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. Mar 2027</div></div>
+          </div>
+          <div class="tl-item fade-in">
+            <div class="tl-left"><div class="tl-dot tl-pending">‚óã</div></div>
+            <div class="tl-content"><div class="tl-row"><div class="tl-name dim">Possession and handover</div><div class="tl-tag tag-soon">Upcoming</div></div><div class="tl-meta">Est. 31 Aug 2027</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ PHOTOS VIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <div class="view" id="view-photos">
+      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>‚Üê</span> Back to dashboard</button>
+      <div class="page-header fade-in">
+        <div><div class="page-title">Site photos</div><div class="page-sub">Bi-weekly updates from Tower B construction site</div></div>
+        <div class="page-actions"><button class="btn-sm btn-secondary">Filter by date</button></div>
+      </div>
+      <div class="card fade-in">
+        <div class="card-header"><div class="card-title">May 2026</div><div style="font-size:12px;color:var(--accent2)">2 new photos</div></div>
+        <div class="photo-grid-lg">
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80" alt="Slab pour">
+            <div class="photo-caption">Slab 14 pour ¬∑ Floor level</div>
+            <div class="photo-date">2 May 2026</div>
+            <div class="photo-new">NEW</div>
+          </div>
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1590644365607-5f31b0a8e6f7?w=600&q=80" alt="Column reinforcement">
+            <div class="photo-caption">Column reinforcement ¬∑ Fl.13</div>
+            <div class="photo-date">2 May 2026</div>
+            <div class="photo-new">NEW</div>
+          </div>
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80" alt="Tower elevation">
+            <div class="photo-caption">Tower B elevation view</div>
+            <div class="photo-date">18 Apr 2026</div>
+          </div>
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Crane and equipment">
+            <div class="photo-caption">Crane and equipment</div>
+            <div class="photo-date">18 Apr 2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card-header"><div class="card-title">April 2026</div></div>
+        <div class="photo-grid-lg">
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80" alt="Rebar work">
+            <div class="photo-caption">Rebar work ¬∑ Fl.12</div>
+            <div class="photo-date">4 Apr 2026</div>
+          </div>
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=600&q=80" alt="Slab completed">
+            <div class="photo-caption">Slab 12 completed</div>
+            <div class="photo-date">4 Apr 2026</div>
+          </div>
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80" alt="External facade">
+            <div class="photo-caption">External facade ¬∑ Fl.8</div>
+            <div class="photo-date">20 Mar 2026</div>
+          </div>
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?w=600&q=80" alt="Scaffold inspection">
+            <div class="photo-caption">Scaffold inspection</div>
+            <div class="photo-date">20 Mar 2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card-header"><div class="card-title">March 2026</div></div>
+        <div class="photo-grid-lg">
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80" alt="Structural work">
+            <div class="photo-caption">Structural work overview</div>
+            <div class="photo-date">6 Mar 2026</div>
+          </div>
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1567359781514-3b964e2b04d6?w=600&q=80" alt="Workers on site">
+            <div class="photo-caption">Site crew ¬∑ Morning shift</div>
+            <div class="photo-date">6 Mar 2026</div>
+          </div>
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1534237710431-e2fc698436d0?w=600&q=80" alt="Foundation">
+            <div class="photo-caption">Lower floor progress</div>
+            <div class="photo-date">20 Feb 2026</div>
+          </div>
+          <div class="photo-thumb-lg">
+            <img src="https://images.unsplash.com/photo-1590644365607-5f31b0a8e6f7?w=600&q=80" alt="Building frame">
+            <div class="photo-caption">Frame and columns ¬∑ Fl.6</div>
+            <div class="photo-date">20 Feb 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ PAYMENTS VIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <div class="view" id="view-payments">
+      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>‚Üê</span> Back to dashboard</button>
+      <div class="page-header fade-in">
+        <div><div class="page-title">Payment schedule</div><div class="page-sub">Godrej Meridian ¬∑ Total consideration ‚Çπ1.1 Cr</div></div>
+        <div class="page-actions"><button class="btn-sm btn-secondary">Download schedule</button><button class="btn-sm btn-primary" onclick="openReminder()">Set reminder</button></div>
+      </div>
+
+      <div class="stats-row fade-in" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card"><div class="sc-label">Total paid</div><div class="sc-val">‚Çπ68L</div><div class="sc-sub up">62% of total</div></div>
+        <div class="stat-card"><div class="sc-label">Next due</div><div class="sc-val">‚Çπ4.2L</div><div class="sc-sub warn">In 38 days</div></div>
+        <div class="stat-card"><div class="sc-label">Remaining</div><div class="sc-val">‚Çπ42L</div><div class="sc-sub">3 instalments left</div></div>
+      </div>
+
+      <div class="alert-banner fade-in">
+        <div class="ab-icon">üìÖ</div>
+        <div class="ab-content">
+          <div class="ab-title">Upcoming payment ‚Äî 38 days</div>
+          <div class="ab-sub">Slab 7 completion milestone triggers ‚Çπ4,20,000. <span>Expected: 13 June 2026.</span> Set a calendar reminder now.</div>
+        </div>
+        <button class="ab-action" onclick="openReminder()">Set reminder</button>
+      </div>
+
+      <div class="card fade-in">
+        <div class="card-header"><div class="card-title">All instalments</div></div>
+        <table class="pay-table">
+          <thead><tr><th>#</th><th>Milestone</th><th>Due date</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--muted)">01</td><td>Booking amount</td><td style="color:var(--muted)">12 Jan 2024</td><td class="pay-table-amt" style="color:var(--green)">‚Çπ11,00,000</td><td><span class="pay-status ps-paid">‚óè Paid</span></td></tr>
+            <tr><td style="color:var(--muted)">02</td><td>On foundation completion</td><td style="color:var(--muted)">5 Apr 2025</td><td class="pay-table-amt" style="color:var(--green)">‚Çπ22,00,000</td><td><span class="pay-status ps-paid">‚óè Paid</span></td></tr>
+            <tr><td style="color:var(--muted)">03</td><td>On podium completion</td><td style="color:var(--muted)">20 Aug 2025</td><td class="pay-table-amt" style="color:var(--green)">‚Çπ35,00,000</td><td><span class="pay-status ps-paid">‚óè Paid</span></td></tr>
+            <tr style="background:rgba(255,176,32,.04)"><td style="color:var(--muted)">04</td><td><strong>On slab 7 completion</strong></td><td style="color:var(--gold);font-weight:600">~13 Jun 2026</td><td class="pay-table-amt" style="color:var(--gold)">‚Çπ4,20,000</td><td><span class="pay-status ps-due">‚ö° Due soon</span></td></tr>
+            <tr><td style="color:var(--muted)">05</td><td>On structure completion</td><td style="color:var(--muted)">Est. Feb 2027</td><td class="pay-table-amt" style="color:var(--muted)">‚Çπ22,00,000</td><td><span class="pay-status ps-upcoming">‚óã Upcoming</span></td></tr>
+            <tr><td style="color:var(--muted)">06</td><td>On possession</td><td style="color:var(--muted)">Est. Aug 2027</td><td class="pay-table-amt" style="color:var(--muted)">‚Çπ16,00,000</td><td><span class="pay-status ps-upcoming">‚óã Upcoming</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ DOCUMENTS VIEW ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ -->
+    <div class="view" id="view-documents">
+      <button class="back-btn" onclick="switchView('overview',document.querySelector('[data-view=overview]'))"><span>‚Üê</span> Back to dashboard</button>
+      <div class="page-header fade-in">
+        <div><div class="page-title">Document vault</div><div class="page-sub">All your agreements, receipts and possession documents</div></div>
+        <div class="page-actions"><button class="btn-sm btn-secondary">Upload document</button></div>
+      </div>
+      <div class="content-grid-full">
+        <div class="card fade-in">
+          <div class="card-header"><div class="card-title">Agreements</div></div>
+          <div class="doc-list">
+            <div class="doc-item"><div class="doc-icon">üìã</div><div class="doc-info"><div class="doc-name">Sale Agreement ‚Äî Flat 14C</div><div class="doc-meta">Signed 12 Jan 2024 ¬∑ Godrej Properties Ltd</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">2.4 MB</div><div class="doc-dl">‚Üì</div></div>
+            <div class="doc-item"><div class="doc-icon">üèõ</div><div class="doc-info"><div class="doc-name">Allotment Letter</div><div class="doc-meta">Issued 14 Jan 2024</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.8 MB</div><div class="doc-dl">‚Üì</div></div>
+            <div class="doc-item"><div class="doc-icon">üìë</div><div class="doc-info"><div class="doc-name">RERA Registration Certificate</div><div class="doc-meta">Project reg. P52100047823 ¬∑ Valid till Dec 2027</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">1.2 MB</div><div class="doc-dl">‚Üì</div></div>
+          </div>
+        </div>
+        <div class="card fade-in">
+          <div class="card-header"><div class="card-title">Payment receipts</div></div>
+          <div class="doc-list">
+            <div class="doc-item"><div class="doc-icon">üßæ</div><div class="doc-info"><div class="doc-name">Receipt ‚Äî Booking amount ‚Çπ11L</div><div class="doc-meta">Issued 12 Jan 2024</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.3 MB</div><div class="doc-dl">‚Üì</div></div>
+            <div class="doc-item"><div class="doc-icon">üßæ</div><div class="doc-info"><div class="doc-name">Receipt ‚Äî Foundation completion ‚Çπ22L</div><div class="doc-meta">Issued 5 Apr 2025</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.3 MB</div><div class="doc-dl">‚Üì</div></div>
+            <div class="doc-item"><div class="doc-icon">üßæ</div><div class="doc-info"><div class="doc-name">Receipt ‚Äî Podium completion ‚Çπ35L</div><div class="doc-meta">Issued 20 Aug 2025</div></div><div class="doc-tag dt-old">PDF</div><div class="doc-size">0.3 MB</div><div class="doc-dl">‚Üì</div></div>
+          </div>
+        </div>
+        <div class="card fade-in">
+          <div class="card-header"><div class="card-title">Legal and approvals</div></div>
+          <div class="doc-list">
+            <div class="doc-item"><div class="doc-icon">‚úÖ</div><div class="doc-info"><div class="doc-name">Approved Building Plan ‚Äî Tower B</div><div class="doc-meta">Municipal Corp of Pune ¬∑ Approved Feb 2023</div></div><div class="doc-tag dt-new">NEW</div><div class="doc-size">4.1 MB</div><div class="doc-dl">‚Üì</div></div>
+            <div class="doc-item"><div class="doc-icon">üîë</div><div class="doc-info"><div class="doc-name">Home Loan Sanction Letter ‚Äî HDFC</div><div class="doc-meta">Loan a/c HL-2024-88823 ¬∑ ‚Çπ75L sanctioned</div></div><div class="doc-tag dt-req">REQUIRED</div><div class="doc-size">1.8 MB</div><div class="doc-dl">‚Üì</div></div>
+            <div class="doc-item"><div class="doc-icon">üìå</div><div class="doc-info"><div class="doc-name">Possession checklist template</div><div class="doc-meta">Use this when you take possession ¬∑ Aug 2027</div></div><div class="doc-tag dt-old">DOCX</div><div class="doc-size">0.2 MB</div><div class="doc-dl">‚Üì</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ‚ïê‚ïê REMINDER MODAL ‚ïê‚ïê -->
+<div class="modal-overlay" id="reminderModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Set payment reminder</div>
+      <div class="modal-close" onclick="closeReminder()">‚úï</div>
+    </div>
+    <div class="modal-body">
+      <div class="rm-payment-card">
+        <div class="rm-pay-icon">‚ö°</div>
+        <div class="rm-pay-info">
+          <div class="rm-pay-name">Slab 7 completion</div>
+          <div class="rm-pay-meta">Expected due date: ~13 June 2026</div>
+        </div>
+        <div class="rm-pay-amt">‚Çπ4.2L</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Remind me on</label>
+        <input class="form-input" type="date" id="reminderDate" value="2026-05-30">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reminder time</label>
+        <div class="form-row">
+          <input class="form-input" type="time" value="09:00">
+          <select class="form-input">
+            <option>On the day</option>
+            <option selected>1 week before</option>
+            <option>2 weeks before</option>
+            <option>1 month before</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notify via</label>
+        <div class="notify-options">
+          <div class="notify-chip selected" onclick="toggleChip(this)">üìß Email</div>
+          <div class="notify-chip selected" onclick="toggleChip(this)">üì± Push notification</div>
+          <div class="notify-chip" onclick="toggleChip(this)">üí¨ WhatsApp</div>
+          <div class="notify-chip" onclick="toggleChip(this)">üìÖ Google Calendar</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Note (optional)</label>
+        <input class="form-input" type="text" placeholder="e.g. Transfer from savings account first" style="margin-bottom:0">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-secondary" onclick="closeReminder()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveReminder()">Save reminder ‚Üí</button>
+    </div>
+  </div>
+</div>
+
+<!-- ‚ïê‚ïê CHAT MODAL ‚ïê‚ïê -->
+<div class="modal-overlay chat-modal" id="chatModal">
+  <div class="modal">
+    <div class="chat-builder-header">
+      <div class="chat-avatar">üèó</div>
+      <div>
+        <div class="chat-builder-name">Godrej Properties ‚Äî Site Team</div>
+        <div class="chat-builder-status"><span class="chat-online-dot"></span>Usually replies within 2 hours</div>
+      </div>
+      <div class="chat-close-btn" onclick="closeChat()">‚úï</div>
+    </div>
+    <div class="modal-body" id="chatMessages">
+      <!-- builder messages -->
+      <div class="msg them">
+        <div class="msg-sender">Godrej Site Team</div>
+        <div class="msg-bubble">Hello Priyanshi! Welcome to Buildwatch. I'm Rajesh from the Godrej Meridian site coordination team. How can I help you today?</div>
+        <div class="msg-time">Today, 9:02 AM</div>
+      </div>
+      <div class="msg them">
+        <div class="msg-bubble">You can ask me about construction progress, upcoming payments, possession timelines, or any concerns about your flat 14C in Tower B.</div>
+        <div class="msg-time">Today, 9:02 AM</div>
+      </div>
+    </div>
+    <div class="chat-quick-btns">
+      <button class="chat-qbtn" onclick="sendQuick('When will slab 14C be completed?')">When is slab 14C done?</button>
+      <button class="chat-qbtn" onclick="sendQuick('What is the current floor count for Tower B?')">Current floor count?</button>
+      <button class="chat-qbtn" onclick="sendQuick('Is my possession date still August 2027?')">Confirm possession date</button>
+    </div>
+    <div class="chat-input-wrap">
+      <textarea class="chat-input" id="chatInput" placeholder="Type your message‚Ä¶" rows="1" onkeydown="handleChatKey(event)"></textarea>
+      <button class="chat-send-btn" onclick="sendMessage()">‚û§</button>
+    </div>
+  </div>
+</div>
+
+<!-- ‚ïê‚ïê TOAST CONTAINER ‚ïê‚ïê -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ‚îÄ‚îÄ COUNTDOWN ‚îÄ‚îÄ
+const diff = Math.ceil((new Date('2027-08-31') - new Date()) / 864e5);
+['cdMain','statDays'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.textContent = diff;
+});
+
+// ‚îÄ‚îÄ SIDEBAR NAV ‚îÄ‚îÄ
+function switchView(name, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  if(el) el.classList.add('active');
+  else {
+    const match = document.querySelector(`.sb-item[data-view="${name}"]`);
+    if(match) match.classList.add('active');
+  }
+  setTimeout(() => {
+    document.querySelectorAll('.prog-fill').forEach(b => {
+      if(!b.style.width || b.style.width === '0%') b.style.width = '62%';
+    });
+  }, 150);
+  document.querySelector('.main').scrollTop = 0;
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.querySelectorAll('.prog-fill').forEach(b => b.style.width = '62%');
+    document.getElementById('sbBar').style.width = '62%';
+  }, 300);
+});
+
+// ‚îÄ‚îÄ PROJECT SWITCHER ‚îÄ‚îÄ
+const projects = [
+  { name:'Godrej Meridian', sub:'Tower B ¬∑ Flat 14C ¬∑ Pune', pct:'62%', status:'+8% this month', paid:'‚Çπ68L', dot:'#2B7FFF', days:'2027-08-31' },
+  { name:'DLF The Crest', sub:'Phase 3 ¬∑ Unit 8B ¬∑ Gurugram', pct:'41%', status:'+5% this month', paid:'‚Çπ55L', dot:'#00E5A0', days:'2028-03-15' },
+  { name:'Lodha Palava', sub:'Wing C ¬∑ Flat 22A ¬∑ Mumbai', pct:'78%', status:'+12% this month', paid:'‚Çπ90L', dot:'#FFB020', days:'2026-12-20' },
+];
+let currentProject = 0;
+
+function toggleDropdown() {
+  document.getElementById('projDropdown').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if(!document.getElementById('projSwitcher').contains(e.target))
+    document.getElementById('projDropdown').classList.remove('open');
+});
+
+function switchProject(idx, e) {
+  if(e) e.stopPropagation();
+  currentProject = idx;
+  const p = projects[idx];
+  document.getElementById('tbProjName').textContent = p.name;
+  document.getElementById('tbProjSub').textContent = p.sub;
+  document.getElementById('tbDot').style.background = p.dot;
+  document.getElementById('tbDot').style.boxShadow = `0 0 6px ${p.dot}`;
+  document.getElementById('sbPct').textContent = p.pct;
+  document.getElementById('sbBar').style.width = p.pct;
+  document.getElementById('sbStatus').textContent = p.status;
+  document.getElementById('statProgress').textContent = p.pct;
+  document.getElementById('statPaid').textContent = p.paid;
+  document.getElementById('overviewSub').textContent = `Here is everything happening with ${p.name} right now`;
+  document.querySelectorAll('.prog-fill').forEach(b => b.style.width = p.pct);
+  const newDiff = Math.ceil((new Date(p.days) - new Date()) / 864e5);
+  ['cdMain','statDays'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = newDiff;
+  });
+  document.querySelectorAll('.proj-opt').forEach((o,i) => {
+    o.classList.toggle('active', i === idx);
+    const check = o.querySelector('.proj-opt-check');
+    if(check) check.remove();
+    if(i === idx) {
+      const chk = document.createElement('div');
+      chk.className = 'proj-opt-check';
+      chk.textContent = '‚úì';
+      o.appendChild(chk);
+    }
+  });
+  document.getElementById('projDropdown').classList.remove('open');
+}
+
+// ‚îÄ‚îÄ TOAST ‚îÄ‚îÄ
+function showToast(icon, title, sub, duration=4000) {
+  const tc = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-text"><div class="toast-title">${title}</div><div class="toast-sub">${sub}</div></div><div class="toast-close" onclick="this.parentElement.remove()">‚úï</div>`;
+  tc.appendChild(t);
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 350); }, duration);
+}
+
+// ‚îÄ‚îÄ REMINDER MODAL ‚îÄ‚îÄ
+function openReminder() {
+  // set default date to 2 weeks before payment
+  const d = new Date('2026-06-13');
+  d.setDate(d.getDate() - 14);
+  document.getElementById('reminderDate').value = d.toISOString().split('T')[0];
+  document.getElementById('reminderModal').classList.add('open');
+}
+function closeReminder() {
+  document.getElementById('reminderModal').classList.remove('open');
+}
+function toggleChip(el) {
+  el.classList.toggle('selected');
+}
+function saveReminder() {
+  const date = document.getElementById('reminderDate').value;
+  const formatted = date ? new Date(date).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}) : '30 May 2026';
+  closeReminder();
+  setTimeout(() => showToast('‚úÖ', 'Reminder saved', `You will be reminded on ${formatted} about the ‚Çπ4.2L payment due.`), 200);
+}
+// close modal on overlay click
+document.getElementById('reminderModal').addEventListener('click', function(e) {
+  if(e.target === this) closeReminder();
+});
+
+// ‚îÄ‚îÄ CHAT MODAL ‚îÄ‚îÄ
+function openChat() {
+  document.getElementById('chatModal').classList.add('open');
+  setTimeout(() => scrollChat(), 100);
+}
+function closeChat() {
+  document.getElementById('chatModal').classList.remove('open');
+}
+document.getElementById('chatModal').addEventListener('click', function(e) {
+  if(e.target === this) closeChat();
+});
+
+function scrollChat() {
+  const box = document.getElementById('chatMessages');
+  box.scrollTop = box.scrollHeight;
+}
+
+function addMsg(text, isMe) {
+  const box = document.getElementById('chatMessages');
+  const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+  const msg = document.createElement('div');
+  msg.className = `msg ${isMe ? 'me' : 'them'}`;
+  msg.innerHTML = `${!isMe ? '<div class="msg-sender">Godrej Site Team</div>' : ''}<div class="msg-bubble">${text}</div><div class="msg-time">Today, ${now}</div>`;
+  box.appendChild(msg);
+  setTimeout(scrollChat, 50);
+}
+
+function showTyping() {
+  const box = document.getElementById('chatMessages');
+  const t = document.createElement('div');
+  t.className = 'msg them';
+  t.id = 'typingIndicator';
+  t.innerHTML = `<div class="chat-typing"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
+  box.appendChild(t);
+  setTimeout(scrollChat, 50);
+  return t;
+}
+
+const builderReplies = {
+  'slab 14c': 'Slab 14 was poured on 2nd May 2026. Your flat 14C will be marked complete once the slab cures and column work is inspected ‚Äî expected by end of May 2026.',
+  'floor count': 'As of today Tower B has reached floor 14. Structural work is ongoing for floors 14 to 16. We expect to top out the structure by September 2026.',
+  'possession': 'Your possession date is confirmed as 31 August 2027, subject to RERA timelines. Any changes will be notified 90 days in advance through this platform.',
+  'default': 'Thank you for your message. Our site coordination team will review this and get back to you within 2 working hours. For urgent matters you can also call +91 98200 11223.',
+};
+
+function getBotReply(text) {
+  const t = text.toLowerCase();
+  if(t.includes('slab') || t.includes('14c') || t.includes('completed')) return builderReplies['slab 14c'];
+  if(t.includes('floor') || t.includes('count') || t.includes('current')) return builderReplies['floor count'];
+  if(t.includes('possession') || t.includes('date') || t.includes('august') || t.includes('handover')) return builderReplies['possession'];
+  return builderReplies['default'];
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  addMsg(text, true);
+  input.value = '';
+  input.style.height = 'auto';
+  const typing = showTyping();
+  setTimeout(() => {
+    typing.remove();
+    addMsg(getBotReply(text), false);
+  }, 1400 + Math.random() * 600);
+}
+
+function sendQuick(text) {
+  document.getElementById('chatInput').value = text;
+  sendMessage();
+}
+
+function handleChatKey(e) {
+  if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+// auto-resize textarea
+document.getElementById('chatInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+});
+</script>
+</body>
+</html>
