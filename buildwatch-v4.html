@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buildwatch ‚Äî Your home is being built. Now you can watch.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#040810;
+  --s1:#070D1A;
+  --s2:#0C1424;
+  --border:#112040;
+  --text:#E8F0FF;
+  --muted:#4A6080;
+  --faint:#0A1828;
+  --accent:#2B7FFF;
+  --accent2:#00D4FF;
+  --gold:#FFB020;
+  --green:#00E5A0;
+  --red:#FF4560;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none}
+#cur{position:fixed;width:10px;height:10px;background:var(--accent2);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .18s,height .18s;mix-blend-mode:screen}
+#cur2{position:fixed;width:34px;height:34px;border:1px solid rgba(0,212,255,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%)}
+a,button{cursor:none}
+
+/* ‚ïê‚ïê NAV ‚ïê‚ïê */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:20px 56px;display:flex;align-items:center;justify-content:space-between}
+nav::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(4,8,16,.96),transparent);pointer-events:none;z-index:-1}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text)}
+.logo-pulse{width:7px;height:7px;background:var(--accent2);border-radius:50%;animation:blink 2s infinite;box-shadow:0 0 8px var(--accent2)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.nav-r{display:flex;align-items:center;gap:28px}
+.nav-r a{font-size:13px;color:var(--muted);text-decoration:none;font-weight:500;transition:color .2s}
+.nav-r a:hover{color:var(--text)}
+.nav-btn{background:var(--accent);color:#fff;border:none;padding:9px 22px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;transition:transform .2s,box-shadow .2s;box-shadow:0 0 20px rgba(43,127,255,.3)}
+.nav-btn:hover{transform:scale(1.05);box-shadow:0 0 32px rgba(43,127,255,.6)}
+
+/* ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+   HERO
+‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê */
+#hero-section{
+  position:relative;height:100vh;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-grain{position:absolute;inset:0;z-index:3;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none}
+
+/* Three.js canvas ‚Äî expands like the image did */
+#building-wrap{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:2;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(43,127,255,.2), 0 20px 80px rgba(0,0,0,.8), 0 0 60px rgba(43,127,255,.08);
+  width:320px;
+  height:420px;
+  transition:none;
+  will-change:width,height,border-radius;
+  background:#040810;
+}
+#building-canvas{width:100%!important;height:100%!important;display:block}
+
+/* overlay that lifts */
+#building-overlay{position:absolute;inset:0;background:rgba(4,8,16,.4);pointer-events:none;z-index:1;transition:none}
+
+/* scan line effect */
+#building-wrap::after{
+  content:'';position:absolute;inset:0;z-index:2;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
+  pointer-events:none;border-radius:inherit;
+}
+
+/* hero text */
+.hero-text-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;text-align:center;pointer-events:none;width:100%}
+.hero-word-top{display:block;font-family:'Cormorant Garamond',serif;font-size:clamp(52px,7vw,96px);font-weight:300;letter-spacing:-.025em;color:var(--text);line-height:1;will-change:transform}
+.hero-word-bot{display:block;font-family:'Cormorant Garamond',serif;font-size:clamp(52px,7vw,96px);font-weight:300;letter-spacing:-.025em;color:var(--text);line-height:1;will-change:transform}
+.hero-word-bot em{font-style:italic;color:var(--accent2);text-shadow:0 0 30px rgba(0,212,255,.4)}
+
+/* scroll hint */
+.hero-scroll-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);animation:fadeIn 1s ease 1s both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.scroll-arrow{width:1px;height:44px;background:linear-gradient(to bottom,var(--accent2),transparent);margin:0 auto;box-shadow:0 0 6px var(--accent2)}
+
+/* floating pills */
+.hero-floats{position:absolute;inset:0;z-index:3;pointer-events:none}
+.fpill{position:absolute;background:rgba(7,13,26,.92);border:1px solid var(--border);border-radius:12px;padding:12px 16px;backdrop-filter:blur(12px);opacity:0;transition:opacity .4s ease;box-shadow:0 0 20px rgba(43,127,255,.08)}
+.fpill.show{opacity:1;animation:float 5s ease-in-out infinite}
+.fp1{top:24%;left:3%;animation-delay:0s!important}
+.fp2{top:30%;right:3%;animation-delay:1.8s!important}
+.fp3{bottom:20%;left:5%;animation-delay:3s!important}
+.fp4{bottom:24%;right:4%;animation-delay:4.2s!important}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.fp-val{font-family:'Cormorant Garamond',serif;font-size:26px;line-height:1;margin-bottom:2px;color:var(--text)}
+.fp-val em{font-style:normal;color:var(--accent2);text-shadow:0 0 12px rgba(0,212,255,.5)}
+.fp-label{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.fp-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 1.5s infinite}
+
+/* hero content reveal */
+.hero-content-reveal{position:absolute;bottom:0;left:0;right:0;z-index:4;padding:48px 60px;opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;pointer-events:none;background:linear-gradient(to top,rgba(4,8,16,.97) 0%,rgba(4,8,16,.7) 60%,transparent 100%);text-align:center;display:flex;flex-direction:column;align-items:center}
+.hero-content-reveal.show{opacity:1;transform:none;pointer-events:auto}
+.hero-eyebrow{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px}
+.eyebrow-line{width:28px;height:1px;background:var(--accent2);box-shadow:0 0 6px var(--accent2)}
+.hero-tagline{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.2vw,26px);font-weight:300;max-width:600px;margin-bottom:28px;line-height:1.5;color:rgba(232,240,255,.75);text-align:center}
+.hero-tagline strong{color:var(--text);font-weight:400}
+.hero-btns{display:flex;gap:12px;justify-content:center}
+.btn-p{background:var(--accent);color:#fff;border:none;padding:13px 28px;border-radius:100px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;transition:transform .2s,box-shadow .2s;box-shadow:0 0 20px rgba(43,127,255,.3)}
+.btn-p:hover{transform:scale(1.04);box-shadow:0 0 40px rgba(43,127,255,.6)}
+.btn-g{background:rgba(43,127,255,.08);color:var(--text);border:1px solid rgba(43,127,255,.2);padding:13px 28px;border-radius:100px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;transition:all .2s;backdrop-filter:blur(8px)}
+.btn-g:hover{background:rgba(43,127,255,.16);border-color:rgba(43,127,255,.4)}
+
+/* TICKER */
+.ticker{overflow:hidden;white-space:nowrap;background:linear-gradient(90deg,var(--accent),#1A60E0);padding:12px 0}
+.ticker-track{display:inline-flex;animation:tick 22s linear infinite}
+.t-item{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fff;padding:0 28px;display:flex;align-items:center;gap:14px}
+.t-sep{color:rgba(255,255,255,.4);font-size:7px}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ‚ïê‚ïê SHARED ‚ïê‚ïê */
+.sec-tag{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);margin-bottom:20px}
+.sec-h{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5vw,68px);line-height:1.02;font-weight:300;letter-spacing:-.015em;margin-bottom:20px}
+.sec-h em{font-style:italic;color:var(--accent2)}
+.rev{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.rev.vis{opacity:1;transform:none}
+
+/* ‚ïê‚ïê PROBLEM ‚ïê‚ïê */
+.problem-sec{padding:130px 60px;position:relative;overflow:hidden;background:var(--bg)}
+.problem-glow{position:absolute;right:-100px;top:50%;transform:translateY(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(43,127,255,.06),transparent 70%);pointer-events:none}
+.problem-inner{max-width:1100px;margin:0 auto;position:relative;z-index:2}
+.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-top:60px}
+.pain-card{background:var(--s1);padding:40px 36px;position:relative;overflow:hidden;transition:background .2s}
+.pain-card:hover{background:var(--s2)}
+.pain-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent2),transparent);transform:scaleX(0);transform-origin:center;transition:transform .4s}
+.pain-card:hover::after{transform:scaleX(1)}
+.pain-num{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;margin-bottom:24px}
+.pain-q{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:21px;line-height:1.35;color:var(--text);margin-bottom:14px;border-left:2px solid var(--accent2);padding-left:16px}
+.pain-d{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* ‚ïê‚ïê BENTO ‚ïê‚ïê */
+.features-sec{padding:130px 60px;background:var(--s1);border-top:1px solid var(--border)}
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:64px;max-width:1100px;margin-left:auto;margin-right:auto}
+.bc{background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:32px;position:relative;overflow:hidden;transition:border-color .25s,transform .2s}
+.bc:hover{border-color:rgba(43,127,255,.4);transform:translateY(-3px)}
+.bc::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 0% 0%,rgba(43,127,255,.05),transparent 60%);opacity:0;transition:opacity .3s}
+.bc:hover::before{opacity:1}
+.bc1{grid-column:span 7}.bc2{grid-column:span 5}.bc3{grid-column:span 4}.bc4{grid-column:span 4}.bc5{grid-column:span 4}
+.bc-visual{width:100%;height:110px;border-radius:12px;margin-bottom:20px;background:var(--faint);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.bc-icon{font-size:30px;margin-bottom:16px;display:block}
+.bc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.01em;margin-bottom:10px}
+.bc-desc{font-size:14px;color:var(--muted);line-height:1.7}
+.bc-tag{display:inline-block;margin-top:16px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent2);background:rgba(0,212,255,.08);padding:4px 12px;border-radius:100px}
+.mpv{display:flex;flex-direction:column;gap:8px;width:100%;padding:0 4px}
+.mpv-row{display:flex;align-items:center;gap:8px}
+.mpv-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px}
+.mpv-d{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.25);color:#00E5A0}
+.mpv-a{background:rgba(43,127,255,.12);border:1px solid rgba(43,127,255,.4);color:#2B7FFF;animation:pb 2s infinite}
+@keyframes pb{0%,100%{border-color:rgba(43,127,255,.25)}50%{border-color:rgba(43,127,255,.9);box-shadow:0 0 8px rgba(43,127,255,.3)}}
+.mpv-p{background:var(--faint);border:1px solid var(--border);color:var(--muted)}
+.mpv-bar{flex:1;height:5px;border-radius:3px;background:var(--faint)}
+.mpv-fill-g{background:linear-gradient(90deg,#00E5A0,#00B880)}
+.mpv-fill-b{background:linear-gradient(90deg,#2B7FFF 60%,var(--faint) 60%)}
+.mpv-text{font-size:9px;color:var(--muted);white-space:nowrap}
+.mpy{display:flex;flex-direction:column;gap:7px;width:100%;padding:0 4px}
+.mpy-row{display:flex;align-items:center;gap:8px;font-size:10px}
+.mpy-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.mpy-lbl{flex:1;color:var(--muted)}
+.mpy-amt{font-family:'Cormorant Garamond',serif;font-size:15px}
+
+/* ‚ïê‚ïê MACBOOK DEMO ‚ïê‚ïê */
+.demo-sec{position:relative;background:var(--bg);border-top:1px solid var(--border)}
+.demo-header{text-align:center;padding:100px 60px 40px;position:relative;z-index:2}
+.mac-scroll-outer{position:relative;height:280vh}
+.mac-sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;perspective:1600px;perspective-origin:50% 40%}
+.macbook{width:min(96vw,1160px);transform:rotateX(32deg) scale(.68) translateY(80px);transform-origin:50% 50%;transform-style:preserve-3d;will-change:transform;filter:drop-shadow(0 80px 160px rgba(0,0,0,.98)) drop-shadow(0 0 80px rgba(43,127,255,.08))}
+.mb-lid{background:linear-gradient(165deg,#1A2030 0%,#0E1420 60%,#080E18 100%);border-radius:18px 18px 0 0;padding:18px 18px 0;position:relative;box-shadow:inset 0 1px 0 rgba(43,127,255,.1),0 0 0 1px #1A2840}
+.mb-lid::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(43,127,255,.2),transparent);border-radius:18px 18px 0 0}
+.mb-camera-wrap{display:flex;justify-content:center;margin-bottom:12px}
+.mb-camera{width:9px;height:9px;border-radius:50%;background:#060A10;border:1px solid #162030;box-shadow:0 0 0 2px #080E18}
+.mb-screen{background:#000;border-radius:10px 10px 0 0;overflow:hidden;aspect-ratio:16/10;width:100%;border:1px solid #040810;box-shadow:inset 0 0 0 1px rgba(43,127,255,.05),inset 0 0 40px rgba(0,0,0,.5)}
+.mb-hinge{height:3px;background:linear-gradient(90deg,#080E18,#162030,#080E18);margin:0 -2px}
+.mb-base{background:linear-gradient(180deg,#111A28 0%,#080E18 100%);height:28px;border-radius:0 0 6px 6px;box-shadow:0 0 0 1px #1A2840;display:flex;align-items:center;justify-content:center}
+.mb-notch{width:150px;height:8px;background:#080E18;border-radius:0 0 10px 10px;border:1px solid #162030;border-top:none}
+.mb-foot{background:linear-gradient(180deg,#0E1420,#070C14);height:18px;margin:0 80px;border-radius:0 0 14px 14px;box-shadow:0 8px 40px rgba(0,0,0,.8),0 0 0 1px #162030}
+.mb-shadow{height:24px;margin:0 120px;background:radial-gradient(ellipse,rgba(43,127,255,.06),transparent 70%);border-radius:50%}
+
+/* DASHBOARD INSIDE */
+.db{width:100%;height:100%;background:#04080E;font-family:'DM Sans',sans-serif;display:grid;grid-template-rows:40px 1fr;overflow:hidden}
+.demo-cta{text-align:center;padding:24px 60px 80px;background:var(--bg);position:relative;z-index:2}
+/* feat-card styles */
+.feat-card{background:var(--s1);padding:36px;position:relative;transition:background .2s}
+.feat-card:hover{background:var(--s2)}
+.feat-wide{padding:48px 60px}
+.feat-card-corner{position:absolute;width:8px;height:8px;border-color:var(--accent2);border-style:solid;opacity:.6}
+.feat-card-corner.tl{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.feat-card-corner.tr{top:-1px;right:-1px;border-width:2px 2px 0 0}
+.feat-card-corner.bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px}
+.feat-card-corner.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.feat-card-head{margin-bottom:0;padding-bottom:24px}
+.feat-card-label{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.feat-card-title{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,2vw,28px);font-weight:300;line-height:1.25;color:var(--text);max-width:360px}
+.feat-card-visual{min-height:160px}
+
+/* ‚ïê‚ïê NUMBERS ‚ïê‚ïê */
+.numbers-sec{padding:130px 60px;position:relative;background:var(--s1);border-top:1px solid var(--border)}
+.numbers-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(43,127,255,.06),transparent 70%);pointer-events:none}
+.numbers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-top:60px;max-width:1100px;margin-left:auto;margin-right:auto}
+.nc{background:var(--s1);padding:60px 48px;text-align:center;transition:background .2s}
+.nc:hover{background:var(--bg)}
+.nv{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,6vw,80px);line-height:1;margin-bottom:10px;font-weight:300}
+.nv em{font-style:normal;color:var(--accent2)}
+.nl{font-size:15px;color:var(--muted);line-height:1.55;font-weight:300}
+
+/* ‚ïê‚ïê CTA ‚ïê‚ïê */
+.cta-sec{padding:160px 60px;text-align:center;position:relative;overflow:hidden;background:var(--bg)}
+.cta-glow{position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(43,127,255,.08),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.cta-h{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,7vw,100px);line-height:.95;font-weight:300;letter-spacing:-.025em;margin-bottom:28px}
+.cta-h em{font-style:italic;color:var(--accent2);text-shadow:0 0 40px rgba(0,212,255,.3)}
+.cta-sub{font-size:18px;color:var(--muted);margin-bottom:52px;max-width:460px;margin-left:auto;margin-right:auto;font-weight:300;line-height:1.7}
+.cta-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.cta-input{padding:15px 24px;border-radius:100px;border:1px solid var(--border);background:rgba(43,127,255,.06);color:var(--text);font-size:15px;width:300px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;backdrop-filter:blur(8px)}
+.cta-input:focus{border-color:var(--accent);box-shadow:0 0 20px rgba(43,127,255,.2)}
+.cta-note{font-size:13px;color:var(--muted)}
+.cta-note a{color:var(--accent2);text-decoration:none}
+footer{border-top:1px solid var(--border);padding:36px 60px;display:flex;align-items:center;justify-content:space-between}
+.ft-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px}
+.ft-meta{font-size:13px;color:var(--muted)}
+.ft-meta a{color:var(--accent2);text-decoration:none}
+
+@media(max-width:900px){
+  nav{padding:16px 24px}
+  .problem-sec,.features-sec,.numbers-sec,.cta-sec,.demo-header,.demo-cta{padding-left:24px;padding-right:24px}
+  .pain-grid{grid-template-columns:1fr}
+  .bento{grid-template-columns:1fr 1fr}
+  .bc1,.bc2,.bc3,.bc4,.bc5{grid-column:span 1}
+  .numbers-grid{grid-template-columns:1fr}
+  .db-body{grid-template-columns:1fr}
+  .db-sb{display:none}
+  .db-stats{grid-template-columns:repeat(2,1fr)}
+  .db-content{grid-template-columns:1fr}
+  .db-r{display:none}
+  .hero-content-reveal{padding:32px 24px}
+  .fpill{display:none}
+}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<nav>
+  <a class="logo" href="#"><span class="logo-pulse"></span>Buildwatch</a>
+  <div class="nav-r">
+    <a href="#problem">Problem</a>
+    <a href="#features">Features</a>
+    <a href="#demo">Demo</a>
+    <button class="nav-btn" onclick="window.open('buildwatch-dashboard.html','_blank')">Open dashboard ‚Üí</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div id="hero-section">
+  <div class="hero-bg">
+    <svg width="100%" height="100%" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="hg1" cx="50%" cy="50%" r="55%"><stop offset="0%" stop-color="#2B7FFF" stop-opacity=".1"/><stop offset="100%" stop-color="#2B7FFF" stop-opacity="0"/></radialGradient>
+        <radialGradient id="hg2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#00D4FF" stop-opacity=".06"/><stop offset="100%" stop-color="#00D4FF" stop-opacity="0"/></radialGradient>
+        <filter id="blur1"><feGaussianBlur stdDeviation="60"/></filter>
+      </defs>
+      <ellipse cx="720" cy="450" rx="520" ry="360" fill="url(#hg1)" filter="url(#blur1)"/>
+      <ellipse cx="200" cy="200" rx="280" ry="200" fill="url(#hg2)" filter="url(#blur1)"/>
+      <g stroke="#0E1828" stroke-width=".6" opacity=".6">
+        <line x1="0" y1="180" x2="1440" y2="180"/><line x1="0" y1="360" x2="1440" y2="360"/>
+        <line x1="0" y1="540" x2="1440" y2="540"/><line x1="0" y1="720" x2="1440" y2="720"/>
+        <line x1="288" y1="0" x2="288" y2="900"/><line x1="576" y1="0" x2="576" y2="900"/>
+        <line x1="720" y1="0" x2="720" y2="900"/><line x1="864" y1="0" x2="864" y2="900"/>
+        <line x1="1152" y1="0" x2="1152" y2="900"/>
+      </g>
+      <rect x="0" y="580" width="55" height="320" rx="2" fill="#060C18" opacity=".95"/>
+      <rect x="60" y="480" width="70" height="420" rx="2" fill="#040810" opacity=".98"/>
+      <rect x="135" y="540" width="35" height="360" rx="2" fill="#060C18" opacity=".9"/>
+      <rect x="1200" y="460" width="60" height="440" rx="2" fill="#040810" opacity=".98"/>
+      <rect x="1265" y="390" width="80" height="510" rx="2" fill="#060C18" opacity=".95"/>
+      <rect x="1350" y="430" width="50" height="470" rx="2" fill="#040810" opacity=".9"/>
+      <g fill="#0E1C30" opacity=".7">
+        <rect x="68" y="500" width="6" height="8" rx="1"/><rect x="80" y="500" width="6" height="8" rx="1"/>
+        <rect x="68" y="518" width="6" height="8" rx="1"/><rect x="80" y="518" width="6" height="8" rx="1"/>
+        <rect x="1275" y="415" width="6" height="8" rx="1"/><rect x="1287" y="415" width="6" height="8" rx="1"/>
+        <rect x="1275" y="433" width="6" height="8" rx="1"/>
+      </g>
+      <line x1="0" y1="897" x2="1440" y2="897" stroke="#2B7FFF" stroke-width="1.5" opacity=".15"/>
+    </svg>
+  </div>
+  <div class="hero-grain"></div>
+
+  <!-- THREE.JS BUILDING -->
+  <div id="building-wrap">
+    <canvas id="building-canvas"></canvas>
+    <div id="building-overlay"></div>
+  </div>
+
+  <!-- text -->
+  <div class="hero-text-wrap">
+    <span class="hero-word-top" id="heroTop">Your home is being</span>
+    <span class="hero-word-bot" id="heroBot"><em>built.</em> Now you can watch.</span>
+  </div>
+
+  <!-- floating pills -->
+  <div class="hero-floats">
+    <div class="fpill fp1" id="fp1"><div class="fp-val"><em>62%</em></div><div class="fp-label"><span class="fp-dot"></span>Tower B complete</div></div>
+    <div class="fpill fp2" id="fp2"><div class="fp-val"><em>‚Çπ4.2L</em></div><div class="fp-label">Due in 38 days</div></div>
+    <div class="fpill fp3" id="fp3"><div class="fp-val"><em>487</em></div><div class="fp-label">Days to possession</div></div>
+    <div class="fpill fp4" id="fp4"><div class="fp-val">Slab <em>14</em></div><div class="fp-label"><span class="fp-dot"></span>Just poured</div></div>
+  </div>
+
+  <div class="hero-scroll-hint" id="scrollHint"><div class="scroll-arrow"></div>Scroll to expand</div>
+
+  <div class="hero-content-reveal" id="heroReveal">
+    <div class="hero-eyebrow"><span class="eyebrow-line"></span>For 50 lakh Indian home buyers</div>
+    <p class="hero-tagline">You paid crores. You waited years. You heard <strong>nothing.</strong> Buildwatch gives under-construction buyers real time visibility, payment forecasts, and peace of mind from booking day to possession day.</p>
+    <div class="hero-btns">
+      <button class="btn-p" onclick="document.getElementById('problem').scrollIntoView({behavior:'smooth'})">See the problem</button>
+      <button class="btn-g" onclick="window.open('buildwatch-dashboard.html','_blank')">Open dashboard ‚Üí</button>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <div class="t-item">Real time progress <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Payment forecasts <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Site photo updates <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Delay alerts <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Document vault <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Builder transparency <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Real time progress <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Payment forecasts <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Site photo updates <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Delay alerts <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Document vault <span class="t-sep">‚óè</span></div>
+    <div class="t-item">Builder transparency <span class="t-sep">‚óè</span></div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem" class="problem-sec">
+  <div class="problem-glow"></div>
+  <div class="problem-inner">
+    <div class="sec-tag rev">The problem</div>
+    <h2 class="sec-h rev">Paying crores<br>and hearing <em>nothing.</em></h2>
+    <p style="font-size:17px;color:var(--muted);max-width:500px;line-height:1.7;font-weight:300" class="rev">The average under-construction project takes 3.5 years. Most buyers receive zero proactive updates in that time.</p>
+    <div class="pain-grid" style="margin-top:56px">
+      <div class="pain-card rev"><div class="pain-num">01 ¬∑ VISIBILITY</div><div class="pain-q">"I paid 40 lakhs and have no idea which floor they're on."</div><div class="pain-d">Buyers have zero window into construction. They rely on WhatsApp rumours and site visits for years.</div></div>
+      <div class="pain-card rev"><div class="pain-num">02 ¬∑ PAYMENTS</div><div class="pain-q">"The payment demand came with 7 days notice. No warning."</div><div class="pain-d">Payments are tied to construction stages. Buyers find out only when the demand letter arrives.</div></div>
+      <div class="pain-card rev"><div class="pain-num">03 ¬∑ TRUST</div><div class="pain-q">"The possession date shifted 8 months. Nobody told me."</div><div class="pain-d">Delays happen silently. No record of what was promised, no alert when things change.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="features-sec">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="sec-tag rev" style="text-align:center">How it works</div>
+    <h2 class="sec-h rev" style="max-width:640px;margin:0 auto 60px;text-align:center">Buildwatch gives you everything your builder <em>should have.</em></h2>
+
+    <!-- ROW 1: two equal cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:20px;overflow:hidden;border:1px solid var(--border);margin-bottom:1px">
+
+      <!-- Card 1: Progress -->
+      <div class="feat-card rev" style="position:relative">
+        <div class="feat-card-corner tl"></div><div class="feat-card-corner tr"></div><div class="feat-card-corner bl"></div><div class="feat-card-corner br"></div>
+        <div class="feat-card-head">
+          <div class="feat-card-label">üìä Construction progress</div>
+          <p class="feat-card-title">Watch every floor go up, not just the finished ones.</p>
+        </div>
+        <div class="feat-card-visual" style="border-top:1px dashed var(--border);position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;background:radial-gradient(ellipse 120% 80% at 50% 0%,transparent 40%,var(--s1) 100%);z-index:1;pointer-events:none"></div>
+          <div style="padding:24px 28px">
+            <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">Tower B ‚Äî milestone tracker</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);display:flex;align-items:center;justify-content:center;font-size:10px;color:#00E5A0;flex-shrink:0">‚úì</div><div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#00E5A0,#00B880)"></div><div style="font-size:11px;color:var(--muted);white-space:nowrap">Foundation ¬∑ Done</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);display:flex;align-items:center;justify-content:center;font-size:10px;color:#00E5A0;flex-shrink:0">‚úì</div><div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#00E5A0,#00B880)"></div><div style="font-size:11px;color:var(--muted);white-space:nowrap">Floors 1‚Äì8 ¬∑ Done</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:rgba(43,127,255,.1);border:1px solid rgba(43,127,255,.4);display:flex;align-items:center;justify-content:center;font-size:10px;color:#2B7FFF;flex-shrink:0;animation:pb 2s infinite">üèó</div><div style="flex:1;height:6px;border-radius:3px;overflow:hidden;background:var(--faint)"><div style="height:100%;width:62%;background:linear-gradient(90deg,#2B7FFF,#00D4FF);border-radius:3px"></div></div><div style="font-size:11px;color:#2B7FFF;font-weight:600;white-space:nowrap">Floor 14 ¬∑ Live</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:var(--faint);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);flex-shrink:0">‚óã</div><div style="flex:1;height:6px;border-radius:3px;background:var(--faint)"></div><div style="font-size:11px;color:var(--muted);white-space:nowrap">Finishing ¬∑ Soon</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Payment forecast -->
+      <div class="feat-card rev" style="position:relative">
+        <div class="feat-card-corner tl"></div><div class="feat-card-corner tr"></div><div class="feat-card-corner bl"></div><div class="feat-card-corner br"></div>
+        <div class="feat-card-head">
+          <div class="feat-card-label">üí≥ Payment forecast</div>
+          <p class="feat-card-title">Know your next payment 45 days before it arrives. Never scramble again.</p>
+        </div>
+        <div class="feat-card-visual" style="border-top:1px dashed var(--border);position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;background:radial-gradient(ellipse 120% 80% at 75% 50%,transparent 40%,var(--s1) 100%);z-index:1;pointer-events:none"></div>
+          <div style="padding:24px 28px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:#00E5A0;flex-shrink:0"></div><div style="flex:1;font-size:12px;color:var(--muted)">Booking amount</div><div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:#00E5A0">‚Çπ11L ‚úì</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:#00E5A0;flex-shrink:0"></div><div style="flex:1;font-size:12px;color:var(--muted)">Foundation completion</div><div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:#00E5A0">‚Çπ57L ‚úì</div></div>
+            <div style="display:flex;align-items:center;gap:10px;background:rgba(255,176,32,.06);border:1px solid rgba(255,176,32,.2);border-radius:8px;padding:8px 10px;margin:2px 0"><div style="width:8px;height:8px;border-radius:50%;background:#FFB020;flex-shrink:0"></div><div style="flex:1;font-size:12px;color:#FFB020;font-weight:500">Slab 7 ¬∑ Due 13 Jun 2026</div><div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:#FFB020">‚Çπ4.2L</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0"></div><div style="flex:1;font-size:12px;color:var(--muted)">Structure completion</div><div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--muted)">‚Çπ22L</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: wide card spanning full width -->
+    <div style="background:var(--border);border-radius:0 0 20px 20px;overflow:hidden;border:1px solid var(--border);border-top:none">
+      <div class="feat-card feat-wide rev" style="position:relative;border-radius:0">
+        <div class="feat-card-corner tl"></div><div class="feat-card-corner tr"></div><div class="feat-card-corner bl"></div><div class="feat-card-corner br"></div>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(20px,2.5vw,32px);font-weight:300;text-align:center;max-width:600px;margin:0 auto 40px;line-height:1.3;color:var(--text)">Three more things that will make you <em style="color:var(--accent2)">stop losing sleep</em> over your home.</p>
+        <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap">
+          <div style="text-align:center;max-width:200px">
+            <div style="width:52px;height:52px;border-radius:16px;background:rgba(43,127,255,.08);border:1px solid rgba(43,127,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px">üì∑</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:8px">Site photo feed</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6">Bi-weekly photos from your exact floor, so you watch your flat actually take shape.</div>
+          </div>
+          <div style="width:1px;background:var(--border);align-self:stretch"></div>
+          <div style="text-align:center;max-width:200px">
+            <div style="width:52px;height:52px;border-radius:16px;background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px">üîî</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:8px">Delay alerts</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6">If a milestone slips you hear it from Buildwatch first, with a revised timeline and explanation.</div>
+          </div>
+          <div style="width:1px;background:var(--border);align-self:stretch"></div>
+          <div style="text-align:center;max-width:200px">
+            <div style="width:52px;height:52px;border-radius:16px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px">üìÑ</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:8px">Document vault</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6">Every agreement, receipt, and possession document in one place. Always downloadable.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MACBOOK DEMO -->
+<section id="demo" class="demo-sec">
+  <div class="demo-header rev">
+    <div class="sec-tag" style="text-align:center">Live demo</div>
+    <h2 class="sec-h" style="text-align:center;font-size:clamp(36px,5vw,68px);max-width:680px;margin:0 auto">This is what your home page <em>actually looks like.</em></h2>
+    <p style="color:var(--muted);font-size:16px;margin-top:14px;font-weight:300">A real buyer dashboard. Everything your builder should have given you from day one.</p>
+  </div>
+  <div class="mac-scroll-outer" id="macOuter">
+    <div class="mac-sticky">
+      <div class="macbook" id="macbook">
+        <div class="mb-lid">
+          <div class="mb-camera-wrap"><div class="mb-camera"></div></div>
+          <div class="mb-screen">
+            <iframe
+              src="buildwatch-dashboard.html"
+              style="width:100%;height:100%;border:none;display:block;border-radius:10px 10px 0 0;"
+              scrolling="yes"
+              title="Buildwatch Dashboard"
+            ></iframe>
+          </div>
+        </div>
+        <div class="mb-hinge"></div>
+        <div class="mb-base"><div class="mb-notch"></div></div>
+        <div class="mb-foot"></div>
+        <div class="mb-shadow"></div>
+      </div>
+    </div>
+  </div>
+  <div class="demo-cta rev">
+    <p style="font-size:14px;color:var(--muted);margin-bottom:20px">This is a real working dashboard. Not a mockup.</p>
+    <button class="btn-p" onclick="window.open('buildwatch-dashboard.html','_blank')" style="font-size:15px;padding:16px 36px">Open the live dashboard ‚Üí</button>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<section class="numbers-sec">
+  <div class="numbers-glow"></div>
+  <div style="max-width:1100px;margin:0 auto;position:relative;z-index:2">
+    <div class="sec-tag rev" style="text-align:center">The scale of the problem</div>
+    <h2 class="sec-h rev" style="text-align:center;font-size:clamp(38px,5vw,64px)">The silence <em>by the numbers.</em></h2>
+    <div class="numbers-grid">
+      <div class="nc rev"><div class="nv"><em>50L+</em></div><div class="nl">Indian families waiting for<br>an under-construction home</div></div>
+      <div class="nc rev"><div class="nv"><em>3.5</em> yrs</div><div class="nl">Average time from booking<br>to possession in India</div></div>
+      <div class="nc rev"><div class="nv"><em>‚Çπ0</em></div><div class="nl">Spent on post-sale digital<br>experience by most builders</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <div class="cta-glow"></div>
+  <div style="position:relative;z-index:2">
+    <div class="sec-tag rev" style="text-align:center">Get early access</div>
+    <h2 class="cta-h rev">Your home deserves<br>more than <em>silence.</em></h2>
+    <p class="cta-sub rev">Join the waitlist. Be the first to know when Buildwatch goes live.</p>
+    <div class="cta-row rev"><input class="cta-input" type="email" placeholder="your@email.com"><button class="btn-p" style="padding:15px 28px">Join waitlist</button></div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-logo">Buildwatch</div>
+  <div class="ft-meta">Built to show what post-sale real estate could feel like ¬∑ <a href="https://www.notion.so/3581f2234ff481e19fbfce1e5e81d65d" target="_blank">PM one pager ‚Üí</a></div>
+</footer>
+
+<script>
+// ‚îÄ‚îÄ CURSOR ‚îÄ‚îÄ
+const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;cur2.style.left=rx+'px';cur2.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('button,a,.bc,.pain-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='18px';cur.style.height='18px';cur2.style.width='48px';cur2.style.height='48px'});
+  el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';cur2.style.width='34px';cur2.style.height='34px'});
+});
+
+// ‚îÄ‚îÄ THREE.JS 3D BUILDING ‚îÄ‚îÄ
+(function initThree(){
+  const wrap   = document.getElementById('building-wrap');
+  const canvas = document.getElementById('building-canvas');
+  const W = ()=>wrap.offsetWidth, H = ()=>wrap.offsetHeight;
+
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(W(), H());
+  renderer.setClearColor(0x040810, 1);
+  renderer.shadowMap.enabled = true;
+
+  const scene  = new THREE.Scene();
+  scene.fog    = new THREE.FogExp2(0x040810, 0.018);
+
+  const camera = new THREE.PerspectiveCamera(45, W()/H(), 0.1, 200);
+  camera.position.set(0, 8, 28);
+  camera.lookAt(0, 6, 0);
+
+  // LIGHTS
+  const ambient = new THREE.AmbientLight(0x1A3060, 1.2);
+  scene.add(ambient);
+  const sun = new THREE.DirectionalLight(0x4488FF, 2.5);
+  sun.position.set(20, 30, 20);
+  sun.castShadow = true;
+  scene.add(sun);
+  const fill = new THREE.DirectionalLight(0x0044AA, 0.8);
+  fill.position.set(-20, 10, -10);
+  scene.add(fill);
+  const rim = new THREE.PointLight(0x00D4FF, 1.5, 60);
+  rim.position.set(-8, 20, 10);
+  scene.add(rim);
+
+  // MATERIALS
+  const matBase    = new THREE.MeshStandardMaterial({color:0x0D1A2E, roughness:.6, metalness:.4});
+  const matGlass   = new THREE.MeshStandardMaterial({color:0x1A3A6A, roughness:.1, metalness:.8, transparent:true, opacity:.85});
+  const matGlassDk = new THREE.MeshStandardMaterial({color:0x0A1830, roughness:.2, metalness:.6, transparent:true, opacity:.9});
+  const matSteel   = new THREE.MeshStandardMaterial({color:0x2A4A70, roughness:.3, metalness:.9});
+  const matActive  = new THREE.MeshStandardMaterial({color:0x2B7FFF, roughness:.2, metalness:.6, emissive:0x0033AA, emissiveIntensity:.4});
+  const matScaffold= new THREE.MeshStandardMaterial({color:0x3A5A80, roughness:.5, metalness:.7});
+  const matCrane   = new THREE.MeshStandardMaterial({color:0x2B7FFF, roughness:.4, metalness:.7, emissive:0x001A55, emissiveIntensity:.3});
+  const matGround  = new THREE.MeshStandardMaterial({color:0x060C18, roughness:.9, metalness:.1});
+
+  const building = new THREE.Group();
+  scene.add(building);
+
+  const FLOORS = 20;
+  const DONE   = 13; // floors completed
+  const FW = 5, FD = 3.5, FH = 0.7;
+
+  // GROUND
+  const gGeo = new THREE.PlaneGeometry(50, 50);
+  const ground = new THREE.Mesh(gGeo, matGround);
+  ground.rotation.x = -Math.PI/2;
+  ground.position.y = -0.1;
+  ground.receiveShadow = true;
+  building.add(ground);
+
+  // Grid lines on ground
+  const gridHelper = new THREE.GridHelper(30, 15, 0x0E1C30, 0x0A1428);
+  gridHelper.position.y = 0;
+  building.add(gridHelper);
+
+  // FLOORS
+  for(let i=0; i<FLOORS; i++){
+    const y = i * (FH + 0.06);
+    const isDone    = i < DONE;
+    const isActive  = i === DONE;
+    const isTop     = i >= DONE + 1;
+
+    // slab
+    const slabGeo = new THREE.BoxGeometry(FW + 0.2, 0.12, FD + 0.2);
+    const slabMat = isDone ? matBase : (isActive ? matActive : matScaffold);
+    const slab    = new THREE.Mesh(slabGeo, slabMat);
+    slab.position.set(0, y + FH, 0);
+    slab.castShadow = slab.receiveShadow = true;
+    building.add(slab);
+
+    if(!isTop){
+      // glass facade panels ‚Äî front and back
+      const panelGeo = new THREE.BoxGeometry(FW - 0.3, FH - 0.1, 0.08);
+      const panelMat = isDone ? matGlass : (isActive ? matActive : matGlassDk);
+      const frontPanel = new THREE.Mesh(panelGeo, panelMat);
+      frontPanel.position.set(0, y + FH/2, FD/2);
+      frontPanel.castShadow = true;
+      building.add(frontPanel);
+
+      const backPanel = new THREE.Mesh(panelGeo, matGlassDk);
+      backPanel.position.set(0, y + FH/2, -FD/2);
+      building.add(backPanel);
+
+      // side panels
+      const sidePanelGeo = new THREE.BoxGeometry(0.08, FH - 0.1, FD - 0.3);
+      const leftPanel  = new THREE.Mesh(sidePanelGeo, matGlassDk);
+      const rightPanel = new THREE.Mesh(sidePanelGeo, matGlassDk);
+      leftPanel.position.set(-FW/2, y + FH/2, 0);
+      rightPanel.position.set(FW/2, y + FH/2, 0);
+      building.add(leftPanel, rightPanel);
+
+      // window divisions (vertical mullions)
+      for(let w=-2; w<=2; w++){
+        const mullGeo = new THREE.BoxGeometry(0.05, FH, 0.1);
+        const mull    = new THREE.Mesh(mullGeo, matSteel);
+        mull.position.set(w * 1.1, y + FH/2, FD/2 + 0.02);
+        building.add(mull);
+      }
+
+      // lit windows (point lights on done floors)
+      if(isDone && i % 2 === 0){
+        const wLight = new THREE.PointLight(0x4488FF, 0.3, 8);
+        wLight.position.set(0, y + FH/2, FD/2 + 1);
+        building.add(wLight);
+      }
+    }
+
+    // ACTIVE FLOOR GLOW
+    if(isActive){
+      const glowLight = new THREE.PointLight(0x2B7FFF, 3, 12);
+      glowLight.position.set(0, y + FH, 0);
+      building.add(glowLight);
+    }
+
+    // SCAFFOLD on unfinished top floors
+    if(isTop && i < DONE + 4){
+      const sfGeo = new THREE.BoxGeometry(0.06, FH + 0.3, 0.06);
+      [-FW/2 - 0.3, FW/2 + 0.3].forEach(sx=>{
+        [-FD/2 - 0.3, FD/2 + 0.3].forEach(sz=>{
+          const sf = new THREE.Mesh(sfGeo, matScaffold);
+          sf.position.set(sx, y + FH/2, sz);
+          building.add(sf);
+        });
+      });
+      // horizontal scaffold bars
+      const hGeo = new THREE.BoxGeometry(FW + 1, 0.05, 0.05);
+      const hBar = new THREE.Mesh(hGeo, matScaffold);
+      hBar.position.set(0, y + FH, FD/2 + 0.3);
+      building.add(hBar);
+    }
+  }
+
+  // CORE / COLUMNS
+  [[-FW/2 + 0.3, -FD/2 + 0.3],[FW/2 - 0.3, -FD/2 + 0.3],[-FW/2 + 0.3, FD/2 - 0.3],[FW/2 - 0.3, FD/2 - 0.3]].forEach(([cx,cz])=>{
+    const colGeo = new THREE.BoxGeometry(0.22, FLOORS*(FH+0.06), 0.22);
+    const col = new THREE.Mesh(colGeo, matSteel);
+    col.position.set(cx, FLOORS*(FH+0.06)/2, cz);
+    col.castShadow = true;
+    building.add(col);
+  });
+
+  // ROOFTOP elements
+  const roofY = FLOORS * (FH + 0.06);
+  const roofGeo = new THREE.BoxGeometry(FW + 0.4, 0.3, FD + 0.4);
+  const roof = new THREE.Mesh(roofGeo, matBase);
+  roof.position.set(0, roofY, 0);
+  building.add(roof);
+  // rooftop water tank
+  const tankGeo = new THREE.CylinderGeometry(0.5, 0.5, 1, 12);
+  const tank = new THREE.Mesh(tankGeo, matSteel);
+  tank.position.set(-1.5, roofY + 0.8, 0);
+  building.add(tank);
+
+  // CRANE
+  const craneGroup = new THREE.Group();
+  // mast
+  const mastGeo = new THREE.BoxGeometry(0.18, 10, 0.18);
+  const mast = new THREE.Mesh(mastGeo, matCrane);
+  mast.position.set(FW/2 + 1.5, roofY + 5, 0);
+  craneGroup.add(mast);
+  // jib (horizontal arm)
+  const jibGeo = new THREE.BoxGeometry(9, 0.14, 0.14);
+  const jib = new THREE.Mesh(jibGeo, matCrane);
+  jib.position.set(FW/2 + 1.5 + 0.5, roofY + 10, 0);
+  craneGroup.add(jib);
+  // counter jib
+  const cjGeo = new THREE.BoxGeometry(3, 0.12, 0.12);
+  const cj = new THREE.Mesh(cjGeo, matCrane);
+  cj.position.set(FW/2 + 1.5 - 2, roofY + 9.8, 0);
+  craneGroup.add(cj);
+  // crane light
+  const craneLight = new THREE.PointLight(0xFF4444, 2, 6);
+  craneLight.position.set(FW/2 + 1.5, roofY + 10.3, 0);
+  craneGroup.add(craneLight);
+  scene.add(craneGroup);
+
+  // NEIGHBORING BUILDINGS (background)
+  [[-10,0,-8,10,0.3],[-11,0,6,8,0.4],[9,0,-6,12,0.25],[11,0,5,7,0.35]].forEach(([x,y,z,h,op])=>{
+    const bGeo = new THREE.BoxGeometry(3+Math.random(), h, 2.5+Math.random());
+    const bMat = new THREE.MeshStandardMaterial({color:0x06101E, roughness:.7, metalness:.3, transparent:true, opacity:op});
+    const b = new THREE.Mesh(bGeo, bMat);
+    b.position.set(x, h/2, z);
+    scene.add(b);
+  });
+
+  // ‚îÄ‚îÄ SCROLL DRIVEN ROTATION ‚îÄ‚îÄ
+  // heroProgress drives: 0 ‚Üí rotate from side, 1 ‚Üí front view
+  // We'll expose a setter that hero scroll calls
+  let targetRotY = Math.PI * 0.6; // start angle (side view ~110 degrees)
+  let currentRotY = targetRotY;
+  const FRONT_ROT = 0; // front face = 0
+
+  window._setBuildingProgress = function(p){
+    // spin from ~0.6œÄ to 0 as progress goes 0‚Üí1
+    // first half: full spin (1.5 turns), second half: settle to front
+    if(p < 0.5){
+      // dramatic spin: extra rotation
+      targetRotY = Math.PI * 0.6 + (1 - p*2) * Math.PI * 1.2;
+    } else {
+      // ease into front
+      const t = (p - 0.5) * 2;
+      targetRotY = THREE.MathUtils.lerp(Math.PI * 0.6, FRONT_ROT, easeOutCubic(t));
+    }
+  };
+
+  function easeOutCubic(t){ return 1 - Math.pow(1-t, 3) }
+
+  // crane light blink
+  let blinkT = 0;
+
+  // RAF loop
+  (function animate(){
+    requestAnimationFrame(animate);
+    // smooth rotation
+    currentRotY += (targetRotY - currentRotY) * 0.06;
+    building.rotation.y = currentRotY;
+    craneGroup.rotation.y = currentRotY;
+    // crane blink
+    blinkT += 0.04;
+    craneLight.intensity = 1.5 + Math.sin(blinkT * 3) * 1.5;
+    // gentle sway when static
+    if(Math.abs(targetRotY - currentRotY) < 0.002){
+      building.rotation.y = FRONT_ROT + Math.sin(Date.now()*0.0003) * 0.015;
+    }
+    renderer.render(scene, camera);
+  })();
+
+  // resize
+  window.addEventListener('resize',()=>{
+    renderer.setSize(W(), H());
+    camera.aspect = W()/H();
+    camera.updateProjectionMatrix();
+  });
+})();
+
+// ‚îÄ‚îÄ HERO SCROLL EXPAND ‚îÄ‚îÄ
+const heroSection = document.getElementById('hero-section');
+const heroMedia   = document.getElementById('building-wrap');
+const heroOverlay = document.getElementById('building-overlay');
+const heroTop     = document.getElementById('heroTop');
+const heroBot     = document.getElementById('heroBot');
+const heroReveal  = document.getElementById('heroReveal');
+const scrollHint  = document.getElementById('scrollHint');
+const pills       = document.querySelectorAll('.fpill');
+
+let heroProgress = 0, heroExpanded = false, touchStartY = 0;
+
+function applyHeroProgress(p){
+  heroProgress = Math.min(Math.max(p,0),1);
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const startW = Math.min(320, vw*.36), startH = Math.min(420, vh*.54);
+  const w = startW + heroProgress*(vw - startW);
+  const h = startH + heroProgress*(vh - startH);
+  heroMedia.style.width  = w+'px';
+  heroMedia.style.height = h+'px';
+  heroMedia.style.borderRadius = (20*(1-heroProgress))+'px';
+  heroOverlay.style.opacity = 0.4 - heroProgress*.4;
+  const slide = heroProgress*(window.innerWidth < 768 ? 35 : 22);
+  heroTop.style.transform = `translateX(-${slide}vw)`;
+  heroBot.style.transform = `translateX(${slide}vw)`;
+  heroTop.style.opacity = 1 - heroProgress*1.6;
+  heroBot.style.opacity = 1 - heroProgress*1.6;
+  scrollHint.style.opacity = 1 - heroProgress*4;
+  pills.forEach(p2=>p2.classList.toggle('show', heroProgress > 0.35));
+  // drive building rotation
+  if(window._setBuildingProgress) window._setBuildingProgress(heroProgress);
+  if(heroProgress >= 0.96){
+    heroReveal.classList.add('show');
+    heroExpanded = true;
+  } else {
+    heroReveal.classList.remove('show');
+    if(heroProgress < 0.5) heroExpanded = false;
+  }
+}
+
+function handleWheel(e){
+  if(heroExpanded && e.deltaY < 0 && window.scrollY <= 2){heroExpanded=false;e.preventDefault();applyHeroProgress(0.94);return}
+  if(!heroExpanded){e.preventDefault();applyHeroProgress(heroProgress+e.deltaY*0.0012);if(!heroExpanded)window.scrollTo(0,0)}
+}
+function handleTouchStart(e){touchStartY=e.touches[0].clientY}
+function handleTouchMove(e){
+  if(!touchStartY)return;
+  const dy=touchStartY-e.touches[0].clientY;
+  if(heroExpanded&&dy<-20&&window.scrollY<=2){heroExpanded=false;e.preventDefault();return}
+  if(!heroExpanded){e.preventDefault();applyHeroProgress(heroProgress+dy*0.007);touchStartY=e.touches[0].clientY;if(!heroExpanded)window.scrollTo(0,0)}
+}
+function handleTouchEnd(){touchStartY=0}
+function handleScroll(){if(!heroExpanded)window.scrollTo(0,0)}
+
+window.addEventListener('wheel',handleWheel,{passive:false});
+window.addEventListener('scroll',handleScroll);
+window.addEventListener('touchstart',handleTouchStart,{passive:false});
+window.addEventListener('touchmove',handleTouchMove,{passive:false});
+window.addEventListener('touchend',handleTouchEnd);
+applyHeroProgress(0);
+
+// ‚îÄ‚îÄ MACBOOK TILT ‚îÄ‚îÄ
+const macbook  = document.getElementById('macbook');
+const macOuter = document.getElementById('macOuter');
+function updateMac(){
+  const rect=macOuter.getBoundingClientRect();
+  const p=Math.min(Math.max(-rect.top/(macOuter.offsetHeight-window.innerHeight),0),1);
+  macbook.style.transform=`rotateX(${32*(1-p)}deg) scale(${.68+.32*p}) translateY(${80*(1-p)}px)`;
+}
+window.addEventListener('scroll',updateMac,{passive:true});
+updateMac();
+
+// ‚îÄ‚îÄ REVEAL ‚îÄ‚îÄ
+const ro=new IntersectionObserver(es=>{es.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('vis'),i*90)})},{threshold:.08});
+document.querySelectorAll('.rev').forEach(r=>ro.observe(r));
+
+// ‚îÄ‚îÄ COUNTDOWN ‚îÄ‚îÄ
+const diff=Math.ceil((new Date('2027-08-31')-new Date())/864e5);
+['dbDays','dbCd'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=diff});
+</script>
+</body>
+</html>
